@@ -1,0 +1,10 @@
+import { z } from "zod";
+
+export const createSchema = z.object({
+  name: z.string().min(1),
+  email: z.string().email(),
+  age: z.number().int().positive(),
+  phoneNumber: z.string().min(10),
+  address: z.string().min(1),
+  tag: z.enum(["VIP", "VVIP", "regular"]),
+});
