@@ -40,6 +40,10 @@ app.use("/api/auth", authRouter);
 app.use("/api/contacts", contactsRouter);
 app.use("/api/employee", employeeRouter);
 
+app.get("/", (req: Request, res: Response) => {
+  res.json({ message: "Welcome to the API backend! 🚀", status: "running" });
+});
+
 app.get("/health", async (_req: Request, res: Response) => {
   try {
     await prisma.$queryRaw`SELECT 1`;
