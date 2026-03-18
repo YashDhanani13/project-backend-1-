@@ -9,7 +9,6 @@ import {
 
 const router = Router();
 router.get("/", getSearch);
-
 router.post("/", createEmployee);
 router.get("/", getEmployee);
 router.put("/:id", updateEmployee);
