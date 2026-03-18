@@ -14,7 +14,7 @@ const app = express();
 // ── Middleware ──────────────────────────────────────────────────────────────
 
 app.use(cors({
-  origin: ["http://localhost:5173"],
+  origin: process.env.FRONTEND_URL || "*",
   credentials: true,
 }));
 
@@ -81,4 +81,10 @@ const start = async () => {
   }
 };
 
-start();
+// Vercel serverless functions shouldn't call app.listen() directly. 
+// Export the app for Vercel, but start it normally locally.
+if (!process.env.VERCEL) {
+  start();
+}
+
+export default app;

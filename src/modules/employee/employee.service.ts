@@ -1,6 +1,5 @@
 import prisma from "../../lib/prisma.js";
 import { EmployeeRole, EmployeeStatus } from "@prisma/client";
-import { getSearch } from "./employee.controller.js";
 
 export const createEmployee = async (data: any) => {
   return await prisma.employee.create({

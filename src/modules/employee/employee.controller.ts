@@ -1,6 +1,5 @@
-// import * as employeeService from "./employee.service";
 import { type Request, type Response } from "express";
-import * as employeeService from "./employee.service";
+import * as employeeService from "./employee.service.js";
 
 export const createEmployee = async (req: Request, res: Response) => {
   try {
