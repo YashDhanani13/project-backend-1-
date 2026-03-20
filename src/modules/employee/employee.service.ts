@@ -9,6 +9,7 @@ export const createEmployee = async (data: any) => {
       role: data.role as EmployeeRole,
       phoneNumber: data.phoneNumber,
       status: data.status as EmployeeStatus,
+      
     },
   });
 };

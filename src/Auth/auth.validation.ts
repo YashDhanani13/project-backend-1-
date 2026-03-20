@@ -1,12 +1,10 @@
 import { z } from "zod";
 
-export const signupSchema = z
-  .object({
+export const signupSchema = z.object({
+    fullName : z.string(),
     email: z.string().email(),
-    password: z.string().min(6),
-    confirmPassword: z.string(),
-  })
-  .refine((data) => data.password === data.confirmPassword, {
-    message: "Passwords does not match",
-    path: ["confirmPassword"],
-  });
+    organizationName: z.string(),
+    password: z.string().min(6), 
+   });
+   
+

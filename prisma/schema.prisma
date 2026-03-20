@@ -8,11 +8,26 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model User {
-  id       Int    @id @default(autoincrement())
-  email    String @unique
-  password String
+model Organization {
+  id               Int      @id @default(autoincrement())
+  organizationName String
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+  users            User[]
 }
+
+model User {
+  id             Int          @id @default(autoincrement())
+  fullName       String      
+  email          String       @unique
+  password       String
+  organizationId Int         
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+  organization   Organization @relation(fields: [organizationId], references: [id])
+}
+
+
 model Contact {
   id          Int      @id @default(autoincrement())
   name        String

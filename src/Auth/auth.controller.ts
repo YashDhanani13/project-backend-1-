@@ -1,8 +1,10 @@
 import * as AuthService from "./auth.service.js";
 import { type Request, type Response } from "express";
-    
+ 
+
+
 export const signup = async (req: Request, res: Response) => {
-  console.log(" Signup Request:", req.body.email);
+  console.log("Signup Request:", req.body.email);
   try {
     const result = await AuthService.signupUser(req.body);
     res.status(201).json({
