@@ -1,46 +1,51 @@
-import "dotenv/config"; // ✅ MUST be first line — no duplicate dotenv below
-
+import "dotenv/config";
 import express, { Request, Response, NextFunction } from "express";
 import cors from "cors";
 import helmet from "helmet";
+
 import cron from "node-cron";
 import prisma from "./src/lib/prisma.js";
 import { router as authRouter } from "./src/Auth/auth.route.js";
 import contactsRouter from "./src/modules/contacts/contacts.route.js";
 import employeeRouter from "./src/modules/employee/employee.route.js";
 
+
 const app = express();
 
-// ── Middleware ──────────────────────────────────────────────────────────────
+// ── Middleware ─────────────────────────
 
-app.use(cors({
-  origin: process.env.FRONTEND_URL || "*",
-  credentials: true,
-}));
+app.use(
+  cors({
+    origin: process.env.FRONTEND_URL || "*",
+    credentials: true,
+  }),
+);
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
-app.use(helmet.contentSecurityPolicy({
-  directives: { defaultSrc: ["'self'"] },
-}));
+app.use(helmet());
 
-// Request logger
+// ── Request Logger ───────────────────
+
 app.use((req: Request, res: Response, next: NextFunction) => {
   const start = Date.now();
   res.on("finish", () => {
-    console.log(`${req.method} ${req.originalUrl} - ${res.statusCode} - ${Date.now() - start}ms`);
+    console.log(
+      `${req.method} ${req.originalUrl} - ${res.statusCode} - ${Date.now() - start}ms`,
+    );
   });
   next();
 });
 
-// ── Routes ──────────────────────────────────────────────────────────────────
+// ── Routes ───────────────────
 
 app.use("/api/auth", authRouter);
 app.use("/api/contacts", contactsRouter);
 app.use("/api/employee", employeeRouter);
 
-app.get("/", (req: Request, res: Response) => {
+
+app.get("/", (_req: Request, res: Response) => {
   res.json({ message: "Welcome to the API backend! 🚀", status: "running" });
 });
 
@@ -60,35 +65,41 @@ app.use((err: Error, _req: Request, res: Response, _next: NextFunction) => {
   res.status(500).json({ message: err.message });
 });
 
-// ── Cron Jobs ───────────────────────────────────────────────────────────────
+// ── Cron Jobs ───────────────
 
 cron.schedule("*/10 * * * *", () => {
   console.log("Cron: running every 10 minutes");
 });
 
-// ── Start Server ────────────────────────────────────────────────────────────
+// ── Process Crash Handlers ────────────────
+process.on("unhandledRejection", (err) => {
+  console.error("❌ Unhandled Rejection:", err);
+  process.exit(1);
+});
+
+process.on("uncaughtException", (err) => {
+  console.error("❌ Uncaught Exception:", err);
+  process.exit(1);
+});
+
+// ── Start Server 
 
 const PORT = process.env.PORT || 3000;
 
 const start = async () => {
   try {
-    await prisma.$connect(); 
-    console.log("Database connected");
+    await prisma.$connect();
+    console.log(" Database connected");
 
     app.listen(PORT, () => {
       console.log(`🚀 Server running on port ${PORT}`);
     });
   } catch (error) {
-    console.error("❌ Failed to start server:", error);
+    console.error("Failed to start server:", error);
     await prisma.$disconnect();
-    process.exit(1); 
+    process.exit(1);
   }
 };
 
-// Vercel serverless functions shouldn't call app.listen() directly. 
-// Export the app for Vercel, but start it normally locally.
-if (!process.env.VERCEL) {
-  start();
-}
 
 export default app;

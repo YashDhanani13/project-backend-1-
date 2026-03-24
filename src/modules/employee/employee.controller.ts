@@ -3,7 +3,13 @@ import * as employeeService from "./employee.service.js";
 
 export const createEmployee = async (req: Request, res: Response) => {
   try {
-    const result = await employeeService.createEmployee(req.body);
+    const userReq = req as any;
+    const body = {
+      ...req.body,
+      organizationId: userReq.organizationId,
+      createdBy: userReq.userId,
+    };
+    const result = await employeeService.createEmployee(body);
 
     res.status(201).json({
       success: true,
@@ -20,7 +26,9 @@ export const createEmployee = async (req: Request, res: Response) => {
 
 export const getEmployee = async (req: Request, res: Response) => {
   try {
-    const result = await employeeService.getEmployee();
+    const userReq = req as any;
+    // ✅ Pass organizationId to only return this org's employees
+    const result = await employeeService.getEmployee(undefined, userReq.organizationId);
 
     res.status(200).json({
       success: true,
@@ -37,9 +45,10 @@ export const getEmployee = async (req: Request, res: Response) => {
 
 export const getSearch = async (req: Request, res: Response) => {
   try {
+    const userReq = req as any;
     const { search } = req.query;
-
-    const result = await employeeService.getEmployee(search as string);
+    // ✅ Pass organizationId so search is scoped to this org only
+    const result = await employeeService.getEmployee(search as string, userReq.organizationId);
 
     res.status(200).json({
       success: true,
@@ -56,8 +65,13 @@ export const getSearch = async (req: Request, res: Response) => {
 
 export const updateEmployee = async (req: Request, res: Response) => {
   try {
+    const userReq = req as any;
     const { id } = req.params;
-    const result = await employeeService.updateEmployee(Number(id), req.body);
+    const body = {
+      ...req.body,
+      updatedBy: userReq.userId,
+    };
+    const result = await employeeService.updateEmployee(Number(id), body);
 
     res.status(200).json({
       success: true,

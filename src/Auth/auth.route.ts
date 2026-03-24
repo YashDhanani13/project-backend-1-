@@ -1,9 +1,9 @@
 import { Router } from "express";
 import type { Request, Response, NextFunction } from "express";
-import { login, signup } from "./auth.controller.js";
+import { login, signup, sendOtp, verifyOtp } from "./auth.controller.js";
 import { signupSchema } from "./auth.validation.js";
 import { z } from "zod";
-
+// import { UserProfile } from "./auth.service.js";
 export const router = Router();
 
 const validate =
@@ -22,5 +22,11 @@ const validate =
     next();
   };
 
+router.post("/send-otp", sendOtp);
+router.post("/verify-otp", verifyOtp);
+
+// Auth routes
 router.post("/signup", validate(signupSchema), signup);
 router.post("/login", login);
+
+// router.get("/userprofile" ,Userprofile );

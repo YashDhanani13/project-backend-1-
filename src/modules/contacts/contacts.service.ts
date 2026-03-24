@@ -1,5 +1,5 @@
+import { PrismaClient, Tag } from "@prisma/client";
 import prisma from "../../lib/prisma.js";
-import { Tag } from "@prisma/client";
 
 export const createContact = async (data: any) => {
   return await prisma.contact.create({
@@ -7,9 +7,11 @@ export const createContact = async (data: any) => {
       name: data.name,
       email: data.email,
       age: data.age,
+      tag: data.tag as Tag,
       phoneNumber: data.phoneNumber,
       address: data.address,
-      tag: data.tag as Tag,
+      organizationId: data.organizationId,
+      createdBy: data.createdBy,
     },
   });
 };
@@ -18,8 +20,15 @@ export const getContacts = async (
   search?: string,
   field?: string,
   value?: string,
+  organizationId?: number,
 ) => {
   const where: any = {};
+
+  
+  
+  if (organizationId) {
+    where.organizationId = organizationId;
+  }
 
   if (search && !field && !value) {
     where.OR = [
@@ -56,11 +65,17 @@ export const updateContact = async (id: number, data: any) => {
       phoneNumber: data.phoneNumber,
       address: data.address,
       tag: data.tag as Tag,
+      updatedBy: data.updatedBy ? Number(data.updatedBy) : undefined,
     },
   });
 };
 
-export const deleteContact = async (id: number) => {
+export const deleteContact = async (id: number, organizationId: number) => {
+  const contact = await prisma.contact.findFirst({
+    where: { id, organizationId },
+  });
+  if (!contact) throw new Error("Contact not found or access denied");
+
   return prisma.contact.delete({
     where: { id },
   });

@@ -9,22 +9,26 @@ export const createEmployee = async (data: any) => {
       role: data.role as EmployeeRole,
       phoneNumber: data.phoneNumber,
       status: data.status as EmployeeStatus,
-      
+      organizationId: data.organizationId,
+      createdBy: data.createdBy,
     },
   });
 };
 
-export const getEmployee = async (search?: string) => {
+export const getEmployee = async (search?: string, organizationId?: number) => {
   return await prisma.employee.findMany({
-    where: search
-      ? {
-          OR: [
-            { name: { contains: search, mode: "insensitive" } },
-            { email: { contains: search, mode: "insensitive" } },
-            { phoneNumber: { contains: search, mode: "insensitive" } },
-          ],
-        }
-      : {},
+    where: {
+      ...(organizationId ? { organizationId } : {}),
+      ...(search
+        ? {
+            OR: [
+              { name: { contains: search, mode: "insensitive" } },
+              { email: { contains: search, mode: "insensitive" } },
+              { phoneNumber: { contains: search, mode: "insensitive" } },
+            ],
+          }
+        : {}),
+    },
   });
 };
 
@@ -37,6 +41,7 @@ export const updateEmployee = async (id: number, data: any) => {
       role: data.role,
       phoneNumber: data.phoneNumber,
       status: data.status,
+      updatedBy: data.updatedBy,
     },
   });
 };
