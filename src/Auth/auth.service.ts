@@ -1,51 +1,44 @@
 import { PrismaClient, Tag } from "@prisma/client";
-import prisma from "../../lib/prisma.js";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
-
 const prisma = new PrismaClient();
 
-interface SignupPayload {
+//jwt  creation here  : -
+const JWT_SECRET = process.env.JWT_SECRET;
+if (!JWT_SECRET) {
+  throw new Error("JWT_SECRET is not defined in environment variables");
+}
+export interface SignupPayload {
   fullName: string;
   email: string;
   organizationName: string;
   password: string;
 }
 
-interface LoginPayload {
+export interface LoginPayload {
   email: string;
   password: string;
 }
-   
-//jwt  creation here  : - 
 
-const JWT_SECRET = process.env.JWT_SECRET;
-if (!JWT_SECRET) {
-  throw new Error("JWT_SECRET is not defined in environment variables");
-}
-
-  
 export const signupUser = async (payload: SignupPayload) => {
-
-  
+  //check exitign user
   const existingUser = await prisma.user.findUnique({
     where: { email: payload.email },
   });
 
   if (existingUser) throw new Error("Email already exists");
 
-  //password hashing  
+  //password hashing
   const hashedPassword = await bcrypt.hash(payload.password, 10);
 
   // create   organization
   const organization = await prisma.organization.create({
     data: {
+    
       organizationName: payload.organizationName,
     },
   });
-
-  //create  a  user  : -
-
+  //create  a  user  : -=
   const user = await prisma.user.create({
     data: {
       fullName: payload.fullName,
@@ -57,7 +50,6 @@ export const signupUser = async (payload: SignupPayload) => {
 
   const token = jwt.sign(
     {
-      id: user.id,
       userId: user.id,
       email: user.email,
       organizationId: user.organizationId,
@@ -112,19 +104,27 @@ export const loginUser = async (payload: LoginPayload) => {
   };
 };
 
-// user Profile: -
-
 // export const getUserProfile = async (userId: string) => {
-
 //   const user = await prisma.user.findUnique({
-//     where:  { id: userId },
+//     // Convert the string userId to a Number here
+//     where: { id: Number(userId) },
 //     select: {
-
-//        name: true,
+//       fullName: true,
 //       email: true,
-//       password : true,
-//     }
-//   })
+//     },
+//   });
 
-//   return user
-// }
+//   if (!user) {
+//     throw new Error("User not found");
+//   }
+//   return user;
+// };
+
+// export const updateUserProfile = async (userId: string) => {
+//   const profileUpdate = await prisma.user.update({
+//     where: { id: Number(userId) },
+//     fullName: true,
+//     email: true,
+//     updatedBy: data.updatedBy ? Number(data.updatedBy) : undefined,
+//   });
+// };

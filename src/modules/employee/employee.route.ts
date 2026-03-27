@@ -6,10 +6,12 @@ import {
   deleteEmployee,
   getSearch,
 } from "./employee.controller.js";
-// import { authMiddleware } from "../../Auth/auth.middleware.js";
+
+
+import { authMiddleware } from "../../Auth/auth.middleware.js";
 
 const router = Router();
-// router.use(authMiddleware);
+router.use(authMiddleware);
 
 router.get("/search", getSearch);
 router.post("/", createEmployee);

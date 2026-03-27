@@ -1,7 +1,16 @@
 import prisma from "../../lib/prisma.js";
 import { EmployeeRole, EmployeeStatus } from "@prisma/client";
 
+
+
 export const createEmployee = async (data: any) => {
+  const orgId = Number(data.organizationId);
+  const creatorId = Number(data.userID);
+
+  if (isNaN(orgId) || isNaN(creatorId)) {
+    throw new Error(`Missing or invalid IDs: organizationId=${data.organizationId}, userID=${data.userID}`);
+  }
+
   return await prisma.employee.create({
     data: {
       name: data.name,
@@ -9,8 +18,8 @@ export const createEmployee = async (data: any) => {
       role: data.role as EmployeeRole,
       phoneNumber: data.phoneNumber,
       status: data.status as EmployeeStatus,
-      organizationId: data.organizationId,
-      createdBy: data.createdBy,
+      organizationId: orgId,
+      createdBy: creatorId,
     },
   });
 };
@@ -32,7 +41,16 @@ export const getEmployee = async (search?: string, organizationId?: number) => {
   });
 };
 
-export const updateEmployee = async (id: number, data: any) => {
+export const updateEmployee = async (
+  id: number,
+  organizationId: number,
+  data: any,
+) => {
+  const employee = await prisma.employee.findFirst({
+    where: { id, organizationId },
+  });
+  if (!employee) throw new Error("Employee not found or access denied");
+
   return await prisma.employee.update({
     where: { id },
     data: {
@@ -46,7 +64,12 @@ export const updateEmployee = async (id: number, data: any) => {
   });
 };
 
-export const deleteEmployee = async (id: number) => {
+export const deleteEmployee = async (id: number, organizationId: number) => {
+  const employee = await prisma.employee.findFirst({
+    where: { id, organizationId },
+  });
+  if (!employee) throw new Error("Employee not found or access denied");
+
   return await prisma.employee.delete({
     where: { id },
   });

@@ -9,7 +9,6 @@ import { router as authRouter } from "./src/Auth/auth.route.js";
 import contactsRouter from "./src/modules/contacts/contacts.route.js";
 import employeeRouter from "./src/modules/employee/employee.route.js";
 
-
 const app = express();
 
 // ── Middleware ─────────────────────────
@@ -101,5 +100,6 @@ const start = async () => {
   }
 };
 
+start();
 
 export default app;

@@ -9,7 +9,6 @@ datasource db {
 }
 
 model Organization {
-  id               Int        @id @default(autoincrement())
   organizationName String
   createdAt        DateTime   @default(now())
   updatedAt        DateTime   @updatedAt
@@ -28,13 +27,14 @@ model User {
   updatedAt      DateTime   @updatedAt
 
   organization      Organization @relation(fields: [organizationId], references: [id])
-  contactsCreated   Contact[]    @relation("ContactCreatedBy") // 👈 contacts this user created
-  contactsUpdated   Contact[]    @relation("ContactUpdatedBy") // 👈 contacts this user updated
-  employeesCreated  Employee[]   @relation("EmployeeCreatedBy") // 👈 employees this user created
-  employeesUpdated  Employee[]   @relation("EmployeeUpdatedBy") // 👈 employees this user updated
+  contactsCreated   Contact[]    @relation("ContactCreatedBy")  contacts this user created
+  contactsUpdated   Contact[]    @relation("ContactUpdatedBy")  contacts this user updated
+  employeesCreated  Employee[]   @relation("EmployeeCreatedBy")  employees this user created
+  employeesUpdated  Employee[]   @relation("EmployeeUpdatedBy")  employees this user updated
 }
 
 model Contact {
+  
   id             Int       @id @default(autoincrement())
   name           String
   email          String    @unique
@@ -44,11 +44,11 @@ model Contact {
   tag            Tag?
   organizationId Int
 
-  createdBy      Int       // 👈 which user created this
-  updatedBy      Int?      // 👈 which user last updated this
+  createdBy      Int  
+  updatedBy      Int?      
 
-  createdAt      DateTime  @default(now())  // ✅ auto
-  updatedAt      DateTime  @updatedAt        // ✅ auto
+  createdAt      DateTime  @default(now()) 
+  updatedAt      DateTime  @updatedAt  
 
   organization    Organization @relation(fields: [organizationId], references: [id])
   createdByUser   User         @relation("ContactCreatedBy", fields: [createdBy], references: [id])
@@ -64,8 +64,8 @@ model Employee {
   status         EmployeeStatus @default(ACTIVE)
   organizationId Int
 
-  createdBy      Int            // 👈 which user created this
-  updatedBy      Int?           // 👈 which user last updated this
+  createdBy      Int           
+  updatedBy      Int?        
 
   createdAt      DateTime       @default(now())  // ✅ auto
   updatedAt      DateTime       @updatedAt        // ✅ auto

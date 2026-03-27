@@ -1,25 +1,29 @@
 import { type Request, type Response } from "express";
 import * as employeeService from "./employee.service.js";
-
 export const createEmployee = async (req: Request, res: Response) => {
   try {
     const userReq = req as any;
+
     const body = {
       ...req.body,
-      organizationId: userReq.organizationId,
-      createdBy: userReq.userId,
+      organizationId: userReq.organizationId, 
+      userID: userReq.userId, // Change 
     };
+
+  
+    console.log("Controller prepared body:", body);
+
     const result = await employeeService.createEmployee(body);
 
     res.status(201).json({
       success: true,
-      message: "Employee created succesfuilly ",
+      message: "Employee created successfully",
       data: result,
     });
   } catch (error: any) {
     res.status(400).json({
       success: false,
-      message: error.message || "Failed to create to employee",
+      message: error.message || "Failed to create employee",
     });
   }
 };
@@ -71,7 +75,7 @@ export const updateEmployee = async (req: Request, res: Response) => {
       ...req.body,
       updatedBy: userReq.userId,
     };
-    const result = await employeeService.updateEmployee(Number(id), body);
+    const result = await employeeService.updateEmployee(Number(id), userReq.organizationId, body);
 
     res.status(200).json({
       success: true,
@@ -88,8 +92,9 @@ export const updateEmployee = async (req: Request, res: Response) => {
 
 export const deleteEmployee = async (req: Request, res: Response) => {
   try {
+    const userReq = req as any;
     const { id } = req.params;
-    const result = await employeeService.deleteEmployee(Number(id));
+    const result = await employeeService.deleteEmployee(Number(id), userReq.organizationId);
     res.status(200).json({
       success: true,
       message: "Employee deleted successfully",

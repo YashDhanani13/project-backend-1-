@@ -2,16 +2,23 @@ import { PrismaClient, Tag } from "@prisma/client";
 import prisma from "../../lib/prisma.js";
 
 export const createContact = async (data: any) => {
+  const orgId = Number(data.organizationId);
+  const creatorId = Number(data.createdBy);
+
+  if (isNaN(orgId) || isNaN(creatorId)) {
+    throw new Error(`Missing or invalid IDs: organizationId=${data.organizationId}, createdBy=${data.createdBy}`);
+  }
+
   return await prisma.contact.create({
     data: {
       name: data.name,
       email: data.email,
-      age: data.age,
+      age: data.age ? Number(data.age) : undefined,
       tag: data.tag as Tag,
       phoneNumber: data.phoneNumber,
       address: data.address,
-      organizationId: data.organizationId,
-      createdBy: data.createdBy,
+      organizationId: orgId,
+      createdBy: creatorId,
     },
   });
 };
@@ -24,8 +31,6 @@ export const getContacts = async (
 ) => {
   const where: any = {};
 
-  
-  
   if (organizationId) {
     where.organizationId = organizationId;
   }
@@ -55,7 +60,12 @@ export const getContacts = async (
   return prisma.contact.findMany({ where });
 };
 
-export const updateContact = async (id: number, data: any) => {
+export const updateContact = async (id: number, organizationId: number, data: any) => {
+  const contact = await prisma.contact.findFirst({
+    where: { id, organizationId },
+  });
+  if (!contact) throw new Error("Contact not found or access denied");
+
   return prisma.contact.update({
     where: { id },
     data: {
