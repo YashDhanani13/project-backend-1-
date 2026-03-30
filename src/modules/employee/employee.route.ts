@@ -7,7 +7,6 @@ import {
   getSearch,
 } from "./employee.controller.js";
 
-
 import { authMiddleware } from "../../Auth/auth.middleware.js";
 
 const router = Router();

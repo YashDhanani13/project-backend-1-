@@ -1,6 +1,9 @@
 import { Router } from "express";
 import type { Request, Response, NextFunction } from "express";
-import { authMiddleware } from "./auth.middleware.js";
+
+import { getUserProfile, updateUserProfile } from "./auth.controller.js";
+
+import { authMiddleware } from  "./auth.middleware.js";
 
 import { signUp, login } from "./auth.controller.js";
 
@@ -33,5 +36,6 @@ const validate =
 router.post("/signup", validate(signupSchema), signUp);
 router.post("/login", login);
 
-// router.get("/userprofile, authMiddleware, createProfile");
-// router.put("/updateUserProfile  , authMiddleware , profileUpdate");
+router.get("/getUserProfile", authMiddleware, getUserProfile);
+
+router.put("/updateUserProfile", authMiddleware, updateUserProfile);

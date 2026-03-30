@@ -2,7 +2,6 @@ import "dotenv/config";
 import express, { Request, Response, NextFunction } from "express";
 import cors from "cors";
 import helmet from "helmet";
-
 import cron from "node-cron";
 import prisma from "./src/lib/prisma.js";
 import { router as authRouter } from "./src/Auth/auth.route.js";
@@ -11,8 +10,13 @@ import employeeRouter from "./src/modules/employee/employee.route.js";
 
 const app = express();
 
-// ── Middleware ─────────────────────────
+// ── Mid
 
+//first call this helmet
+app.use(helmet());
+
+
+//second  call this cors  
 app.use(
   cors({
     origin: process.env.FRONTEND_URL || "*",
@@ -20,12 +24,12 @@ app.use(
   }),
 );
 
+//third call this express json and urlencoded
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
-app.use(helmet());
-
 // ── Request Logger ───────────────────
+// this for  know where the  eror is coming from and how much time it is taking to process the request
 
 app.use((req: Request, res: Response, next: NextFunction) => {
   const start = Date.now();

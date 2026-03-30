@@ -15,6 +15,7 @@ export interface SignupPayload {
   password: string;
 }
 
+
 export interface LoginPayload {
   email: string;
   password: string;
@@ -34,7 +35,6 @@ export const signupUser = async (payload: SignupPayload) => {
   // create   organization
   const organization = await prisma.organization.create({
     data: {
-    
       organizationName: payload.organizationName,
     },
   });
@@ -104,27 +104,36 @@ export const loginUser = async (payload: LoginPayload) => {
   };
 };
 
-// export const getUserProfile = async (userId: string) => {
-//   const user = await prisma.user.findUnique({
-//     // Convert the string userId to a Number here
-//     where: { id: Number(userId) },
-//     select: {
-//       fullName: true,
-//       email: true,
-//     },
-//   });
+export const getUserProfile = async (userId: string) => {
+  const user = await prisma.user.findUnique({
+    where: { id: Number(userId) },
+    select: {
+      fullName: true,
+      email: true,
+    },
+  });
 
-//   if (!user) {
-//     throw new Error("User not found");
-//   }
-//   return user;
-// };
+  if (!user) {
+    throw new Error("User not found");
+  }
 
-// export const updateUserProfile = async (userId: string) => {
-//   const profileUpdate = await prisma.user.update({
-//     where: { id: Number(userId) },
-//     fullName: true,
-//     email: true,
-//     updatedBy: data.updatedBy ? Number(data.updatedBy) : undefined,
-//   });
-// };
+  return user;
+}; // ✅ CORRECT
+
+
+
+export const updateUserProfile = async (
+  userId: string,
+  data: any
+) => {
+  const profileUpdate = await prisma.user.update({
+    where: { id: Number(userId) },
+    data: {
+      fullName: data.fullName,
+      email: data.email,
+      // updatedBy: Number(userId), // ✅ User updating himself!
+    },
+  });
+
+  return profileUpdate;
+};
