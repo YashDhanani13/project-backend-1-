@@ -1,9 +1,5 @@
 import { EmployeeRole, EmployeeStatus } from "@prisma/client";
-
-
 //  typing  checking  here :-  
-
-
 export interface Employee {
   id: number;
   name: string;

@@ -6,11 +6,10 @@ export const createEmployee = async (req: Request, res: Response) => {
 
     const body = {
       ...req.body,
-      organizationId: userReq.organizationId, 
-      userID: userReq.userId, // Change 
+      organizationId: userReq.organizationId,
+      userID: userReq.userId, // Change
     };
 
-  
     console.log("Controller prepared body:", body);
 
     const result = await employeeService.createEmployee(body);
@@ -31,8 +30,10 @@ export const createEmployee = async (req: Request, res: Response) => {
 export const getEmployee = async (req: Request, res: Response) => {
   try {
     const userReq = req as any;
-    // ✅ Pass organizationId to only return this org's employees
-    const result = await employeeService.getEmployee(undefined, userReq.organizationId);
+    const result = await employeeService.getEmployee(
+      undefined,
+      userReq.organizationId,
+    );
 
     res.status(200).json({
       success: true,
@@ -51,8 +52,11 @@ export const getSearch = async (req: Request, res: Response) => {
   try {
     const userReq = req as any;
     const { search } = req.query;
-    // ✅ Pass organizationId so search is scoped to this org only
-    const result = await employeeService.getEmployee(search as string, userReq.organizationId);
+
+    const result = await employeeService.getEmployee(
+      search as string,
+      userReq.organizationId,
+    );
 
     res.status(200).json({
       success: true,
@@ -75,7 +79,11 @@ export const updateEmployee = async (req: Request, res: Response) => {
       ...req.body,
       updatedBy: userReq.userId,
     };
-    const result = await employeeService.updateEmployee(Number(id), userReq.organizationId, body);
+    const result = await employeeService.updateEmployee(
+      Number(id),
+      userReq.organizationId,
+      body,
+    );
 
     res.status(200).json({
       success: true,
@@ -94,7 +102,10 @@ export const deleteEmployee = async (req: Request, res: Response) => {
   try {
     const userReq = req as any;
     const { id } = req.params;
-    const result = await employeeService.deleteEmployee(Number(id), userReq.organizationId);
+    const result = await employeeService.deleteEmployee(
+      Number(id),
+      userReq.organizationId,
+    );
     res.status(200).json({
       success: true,
       message: "Employee deleted successfully",

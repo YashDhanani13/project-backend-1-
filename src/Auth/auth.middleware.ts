@@ -2,13 +2,8 @@ import jwt from "jsonwebtoken";
 import { Request, Response, NextFunction } from "express";
 import prisma from "../lib/prisma.js";
 
-export const authMiddleware = async (
-  req: any,
-  res: Response,
-  next: NextFunction
-) => {
+export const authMiddleware = async ( req: any, res: Response, next: NextFunction,) => {
   try {
-
     const token = req.headers.authorization?.split(" ")[1];
 
     if (!token) {
@@ -17,10 +12,7 @@ export const authMiddleware = async (
       });
     }
 
-    const decoded: any = jwt.verify(
-      token,
-      process.env.JWT_SECRET!
-    );
+    const decoded: any = jwt.verify(token, process.env.JWT_SECRET!);
 
     const userId = decoded.userId || decoded.id;
     let organizationId = decoded.organizationId;
@@ -42,24 +34,19 @@ export const authMiddleware = async (
       });
     }
 
-    // ✅ best practice
     req.user = {
       userId,
       organizationId,
     };
 
-    // Also set on req directly for easier access
     req.userId = userId;
     req.organizationId = organizationId;
 
     next();
-
   } catch (error: any) {
-
     return res.status(401).json({
       message: "Invalid token",
       error: error.message,
     });
-
   }
 };

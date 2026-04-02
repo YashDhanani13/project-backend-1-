@@ -8,28 +8,31 @@ import { router as authRouter } from "./src/Auth/auth.route.js";
 import contactsRouter from "./src/modules/contacts/contacts.route.js";
 import employeeRouter from "./src/modules/employee/employee.route.js";
 
+
+
 const app = express();
 
-// ── Mid
+
 
 //first call this helmet
 app.use(helmet());
 
 
+
+
 //second  call this cors  
 app.use(
   cors({
-    origin: process.env.FRONTEND_URL || "*",
+    origin: process.env.FRONTEND_URL || "http://localhost:5173",
     credentials: true,
   }),
 );
 
-//third call this express json and urlencoded
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
-// ── Request Logger ───────────────────
-// this for  know where the  eror is coming from and how much time it is taking to process the request
+// ── Request Logger ─────────
 
 app.use((req: Request, res: Response, next: NextFunction) => {
   const start = Date.now();
@@ -73,6 +76,8 @@ app.use((err: Error, _req: Request, res: Response, _next: NextFunction) => {
 cron.schedule("*/10 * * * *", () => {
   console.log("Cron: running every 10 minutes");
 });
+
+
 
 // ── Process Crash Handlers ────────────────
 process.on("unhandledRejection", (err) => {

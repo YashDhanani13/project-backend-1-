@@ -1,14 +1,14 @@
 import prisma from "../../lib/prisma.js";
 import { EmployeeRole, EmployeeStatus } from "@prisma/client";
 
-
-
 export const createEmployee = async (data: any) => {
   const orgId = Number(data.organizationId);
   const creatorId = Number(data.userID);
 
   if (isNaN(orgId) || isNaN(creatorId)) {
-    throw new Error(`Missing or invalid IDs: organizationId=${data.organizationId}, userID=${data.userID}`);
+    throw new Error(
+      `Missing or invalid IDs: organizationId=${data.organizationId}, userID=${data.userID}`,
+    );
   }
 
   return await prisma.employee.create({
