@@ -6,7 +6,9 @@ export const createContact = async (data: any) => {
   const creatorId = Number(data.createdBy);
 
   if (isNaN(orgId) || isNaN(creatorId)) {
-    throw new Error(`Missing or invalid IDs: organizationId=${data.organizationId}, createdBy=${data.createdBy}`);
+    throw new Error(
+      `Missing or invalid IDs: organizationId=${data.organizationId}, createdBy=${data.createdBy}`,
+    );
   }
 
   return await prisma.contact.create({
@@ -60,14 +62,18 @@ export const getContacts = async (
   return prisma.contact.findMany({ where });
 };
 
-export const updateContact = async (id: number, organizationId: number, data: any) => {
+export const updateContact = async (
+  id: number,
+  organizationId: number,
+  data: any,
+) => {
   const contact = await prisma.contact.findFirst({
     where: { id, organizationId },
   });
   if (!contact) throw new Error("Contact not found or access denied");
 
   return prisma.contact.update({
-    where: { id },
+    where: { id },            
     data: {
       name: data.name,
       email: data.email,
@@ -90,3 +96,17 @@ export const deleteContact = async (id: number, organizationId: number) => {
     where: { id },
   });
 };
+
+
+// export const  getsearch  = async (search: string  ) => { 
+
+//     const  search =  await  prisma.contact.findMany({
+//         where: {
+//             OR: [
+//                 { name: { contains: search, mode: "insensitive" } },
+//                 { email: { contains: search, mode: "insensitive" } },
+//                 { address: { contains: search, mode: "insensitive" } },
+//                 { phoneNumber: { contains: search, mode: "insensitive" } },
+//             ]
+//         }
+//     });

@@ -1,10 +1,11 @@
 import "dotenv/config";
+import cookieParser from "cookie-parser";
 import express, { Request, Response, NextFunction } from "express";
 import cors from "cors";
 import helmet from "helmet";
 import cron from "node-cron";
 import prisma from "./src/lib/prisma.js";
-import { router as authRouter } from "./src/Auth/auth.route.js";
+import { router as authRouter } from "./src/auth/auth.route.js";
 import contactsRouter from "./src/modules/contacts/contacts.route.js";
 import employeeRouter from "./src/modules/employee/employee.route.js";
 
@@ -13,18 +14,18 @@ import employeeRouter from "./src/modules/employee/employee.route.js";
 const app = express();
 
 
+app.use(cookieParser());
+
 
 //first call this helmet
 app.use(helmet());
 
+//second call this cors :- 
 
-
-
-//second  call this cors  
 app.use(
   cors({
     origin: process.env.FRONTEND_URL || "http://localhost:5173",
-    credentials: true,
+    credentials: true, //cookie for 
   }),
 );
 
@@ -55,6 +56,7 @@ app.get("/", (_req: Request, res: Response) => {
   res.json({ message: "Welcome to the API backend! 🚀", status: "running" });
 });
 
+
 app.get("/health", async (_req: Request, res: Response) => {
   try {
     await prisma.$queryRaw`SELECT 1`;
@@ -76,8 +78,6 @@ app.use((err: Error, _req: Request, res: Response, _next: NextFunction) => {
 cron.schedule("*/10 * * * *", () => {
   console.log("Cron: running every 10 minutes");
 });
-
-
 
 // ── Process Crash Handlers ────────────────
 process.on("unhandledRejection", (err) => {

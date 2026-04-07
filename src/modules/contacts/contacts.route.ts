@@ -7,12 +7,12 @@ import {
   // getSearch,
 } from "./contacts.controller.js";
 
-import { authMiddleware } from "../../Auth/auth.middleware.js";
+import { authMiddleware } from "../../auth/auth.middleware.js";
 
 const router = Router();
 
 router.use(authMiddleware);
-// 
+
 // router.get("/search", getSearch);
 
 router.post("/", createContact);

@@ -2,7 +2,7 @@ import jwt from "jsonwebtoken";
 import { Request, Response, NextFunction } from "express";
 import prisma from "../lib/prisma.js";
 
-export const authMiddleware = async ( req: any, res: Response, next: NextFunction,) => {
+export const authMiddleware = async ( req: any , res: Response, next: NextFunction ) => {
   try {
     const token = req.headers.authorization?.split(" ")[1];
 
@@ -12,11 +12,11 @@ export const authMiddleware = async ( req: any, res: Response, next: NextFunctio
       });
     }
 
-    const decoded: any = jwt.verify(token, process.env.JWT_SECRET!);
-
+    const decoded: any = jwt.verify(token, process.env.JWT_ACCESS_SECRET!);
     const userId = decoded.userId || decoded.id;
     let organizationId = decoded.organizationId;
 
+   
     // get org if missing
     if (!organizationId && userId) {
       const user = await prisma.user.findUnique({
@@ -41,7 +41,6 @@ export const authMiddleware = async ( req: any, res: Response, next: NextFunctio
 
     req.userId = userId;
     req.organizationId = organizationId;
-
     next();
   } catch (error: any) {
     return res.status(401).json({
