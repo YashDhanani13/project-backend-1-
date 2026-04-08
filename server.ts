@@ -9,13 +9,7 @@ import { router as authRouter } from "./src/auth/auth.route.js";
 import contactsRouter from "./src/modules/contacts/contacts.route.js";
 import employeeRouter from "./src/modules/employee/employee.route.js";
 
-
-
 const app = express();
-
-
-app.use(cookieParser());
-
 
 //first call this helmet
 app.use(helmet());
@@ -28,6 +22,9 @@ app.use(
     credentials: true, //cookie for 
   }),
 );
+
+app.use(cookieParser());
+
 
 
 app.use(express.json());

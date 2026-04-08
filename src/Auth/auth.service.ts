@@ -103,21 +103,8 @@ export const getUserProfile = async (userId: string) => {
   if (!user) {
     throw new Error("User not found");
   }
-
   return user;
 };
-
-// export const updateUserProfile = async (userId: string, data: any) => {
-//   const profileUpdate = await prisma.user.update({
-//     where: { id: Number(userId) },
-//     data: {
-//       fullName: data.fullName,
-//       email: data.email,
-//     },
-//   });
-
-//   return profileUpdate;
-// };
 
 export const updateUserProfile = async (
   userId: string,

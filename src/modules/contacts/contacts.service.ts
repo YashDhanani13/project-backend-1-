@@ -109,4 +109,6 @@ export const deleteContact = async (id: number, organizationId: number) => {
 //                 { phoneNumber: { contains: search, mode: "insensitive" } },
 //             ]
 //         }
+
 //     });
+//   }

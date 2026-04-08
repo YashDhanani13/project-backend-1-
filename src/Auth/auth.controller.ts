@@ -24,7 +24,6 @@ export const signUp = async (req: Request, res: Response) => {
   }
 };
 
-
 export const login = async (req: Request, res: Response) => {
   try {
     const validated = loginSchema.parse(req.body);
@@ -32,9 +31,9 @@ export const login = async (req: Request, res: Response) => {
 
     res.cookie("refreshToken", result.refreshToken, {
       httpOnly: true,
-      secure: true, 
+      secure: true,
       sameSite: "strict",
-      maxAge: 5 * 24 * 60 * 60 * 1000, 
+      maxAge: 5 * 24 * 60 * 60 * 1000,
     });
 
     res.status(200).json({
@@ -70,19 +69,18 @@ export const getUserProfile = async (req: any, res: Response) => {
 };
 
 export const updateUserProfile = async (req: any, res: Response) => {
-
   try {
     const user = req.user;
-     const userReq = req as any;
+    const userReq = req as any;
 
     const body = {
       ...req.body,
       updatedBy: user.userId,
     };
 
-    const result = await authService.updateUserProfile 
-    (user.userId, 
-         userReq.organizationId,
+    const result = await authService.updateUserProfile(
+      user.userId,
+      userReq.organizationId,
       body,
     );
 
