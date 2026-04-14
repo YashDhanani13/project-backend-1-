@@ -71,7 +71,7 @@ export const loginUser = async (payload: LoginPayload) => {
       organizationId: user.organizationId,
     },
     JWT_ACCESS_SECRET,
-    { expiresIn: "15m" },
+    { expiresIn: "1d" },
   );
 
   const refreshToken = jwt.sign({ userId: user.id }, JWT_REFRESH_SECRET, {

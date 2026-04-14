@@ -97,18 +97,3 @@ export const deleteContact = async (id: number, organizationId: number) => {
   });
 };
 
-
-// export const  getsearch  = async (search: string  ) => { 
-
-//     const  search =  await  prisma.contact.findMany({
-//         where: {
-//             OR: [
-//                 { name: { contains: search, mode: "insensitive" } },
-//                 { email: { contains: search, mode: "insensitive" } },
-//                 { address: { contains: search, mode: "insensitive" } },
-//                 { phoneNumber: { contains: search, mode: "insensitive" } },
-//             ]
-//         }
-
-//     });
-//   }

@@ -49,7 +49,7 @@ model Contact {
 
   createdAt      DateTime  @default(now()) 
   updatedAt      DateTime  @updatedAt  
-
+  
   organization    Organization @relation(fields: [organizationId], references: [id])
   createdByUser   User         @relation("ContactCreatedBy", fields: [createdBy], references: [id])
   updatedByUser   User?        @relation("ContactUpdatedBy", fields: [updatedBy], references: [id])
@@ -89,5 +89,5 @@ enum EmployeeRole {
 
 enum EmployeeStatus {
   ACTIVE
-  INACTIVE
+  INACTIVE b
 }
