@@ -1,16 +1,16 @@
 import "dotenv/config";
 import cookieParser from "cookie-parser";
-import express, { Request, Response, NextFunction } from "express";
-import cors from "cors";
-import helmet from "helmet";
-import cron from "node-cron";
+import express, { Request, Response, NextFunction } from "express";   
+import cors from "cors";  // this only allow which you alllow with comunication for 
+import helmet from "helmet";  // csp for  security for this  
+import cron from "node-cron";   // automatic run the  messaage 
 import prisma from "./src/lib/prisma.js";
-import { router as authRouter } from "./src/auth/auth.route.js";
-import contactsRouter from "./src/modules/contacts/contacts.route.js";
-import employeeRouter from "./src/modules/employee/employee.route.js";
+import { router as authRouter } from "./src/auth/auth.route.js";     // auth file : [singup .  login]
+import contactsRouter from "./src/modules/contacts/contacts.route.js";  // contact route file
+import employeeRouter from "./src/modules/employee/employee.route.js";   // employe route file
 
 const app = express();
-app.use(helmet());
+app.use(helmet());   // secure the malware image  , link , png, video   etc : 
 
 app.use(
   cors({
@@ -19,11 +19,12 @@ app.use(
   }),
 );
 
-app.use(cookieParser());
-app.use(express.json());  
-app.use(express.urlencoded({ extended: false }));
+app.use(cookieParser());  //  this used to  store  refresh token for thsi used
 
-// ── Request Logger ─────────
+app.use(express.json());    // build in middleware
+app.use(express.urlencoded({ extended: false })); // build in middleware 
+
+//which request call this throguh show in terminal  
 
 app.use((req: Request, res: Response, next: NextFunction) => {
   const start = Date.now();
@@ -34,18 +35,20 @@ app.use((req: Request, res: Response, next: NextFunction) => {
   });
   next();
 });
-// ── Routes ───────────────────
+
+//  route call 
 
 app.use("/api/auth", authRouter);
 app.use("/api/contacts", contactsRouter);
 app.use("/api/employee", employeeRouter);
 
+//starting message :-
 
 app.get("/", (_req: Request, res: Response) => {
   res.json({ message: "Welcome to the API backend! 🚀", status: "running" });
 });
 
-
+// this checkk the  database health check 
 app.get("/health", async (_req: Request, res: Response) => {
   try {
     await prisma.$queryRaw`SELECT 1`;
@@ -54,8 +57,7 @@ app.get("/health", async (_req: Request, res: Response) => {
     res.status(500).json({ message: "Database connection failed" });
   }
 });
-
-// ── Global Error Handler ────────────────────────────────────────────────────
+//  show the error 
 
 app.use((err: Error, _req: Request, res: Response, _next: NextFunction) => {
   console.error(`[Error] ${err.message}`);
@@ -68,16 +70,16 @@ cron.schedule("*/10 * * * *", () => {
   console.log("Cron: running every 10 minutes");
 });
 
-// ── Process Crash Handlers ────────────────
-process.on("unhandledRejection", (err) => {
-  console.error("❌ Unhandled Rejection:", err);
-  process.exit(1);
-});
+// // ── Process Crash Handlers ────────────────
+// process.on("unhandledRejection", (err) => {
+//   console.error("❌ Unhandled Rejection:", err);
+//   process.exit(1);
+// });
 
-process.on("uncaughtException", (err) => {
-  console.error("❌ Uncaught Exception:", err);
-  process.exit(1);
-});
+// process.on("uncaughtException", (err) => {
+//   console.error("❌ Uncaught Exception:", err);
+//   process.exit(1);
+// });
 
 // ── Start Server 
 
@@ -88,6 +90,8 @@ const start = async () => {
     await prisma.$connect();
     console.log(" Database connected");
 
+
+    //port 
     app.listen(PORT, () => {
       console.log(`🚀 Server running on port ${PORT}`);
     });

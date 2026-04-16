@@ -12,7 +12,7 @@ const router = Router();
 
 router.use(authMiddleware);
 
-// router.get("/search",getContacts );
+//  ro uter.get("/search",getContacts );
 
 router.post("/", createContact);
 router.get("/", getContacts);

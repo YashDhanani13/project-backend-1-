@@ -6,7 +6,7 @@ import { signUp, login } from "./auth.controller.js";
 
 export const router = Router();
 
-router.post("/signup", signUp);
+router.post("/4", signUp);
 router.post("/login", login);
 
 router.get("/getUserProfile", authMiddleware, getUserProfile);

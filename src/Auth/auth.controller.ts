@@ -1,7 +1,6 @@
 import * as authService from "./auth.service.js";
 
 // import   updateUserProfile from  "./auth.service.js";
-
 import { type Request, type Response } from "express";
 
 import { loginSchema, signupSchema } from "./auth.validation.js";

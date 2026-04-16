@@ -9,11 +9,9 @@ export const createEmployee = async (req: Request, res: Response) => {
       organizationId: userReq.organizationId,
       userID: userReq.userId, // Change
     };
-
     console.log("Controller prepared body:", body);
-
+    
     const result = await employeeService.createEmployee(body);
-
     res.status(201).json({
       success: true,
       message: "Employee created successfully",

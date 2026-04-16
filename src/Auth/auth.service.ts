@@ -24,7 +24,8 @@ export const signupUser = async (payload: SignupPayload) => {
 
   if (existingUser) throw new Error("Email already exists");
 
-  //password hashing
+
+  //hash  before this are  create this password so create time this   are  hashh 
   const hashedPassword = await bcrypt.hash(payload.password, 10);
 
   // create organization
@@ -52,6 +53,7 @@ export const signupUser = async (payload: SignupPayload) => {
 // ────────────────────────────────────────────────────────────────────────────
 
 export const loginUser = async (payload: LoginPayload) => {
+  
   const user = await prisma.user.findUnique({
     where: { email: payload.email },
     include: { organization: true },
@@ -70,7 +72,7 @@ export const loginUser = async (payload: LoginPayload) => {
       email: user.email,
       organizationId: user.organizationId,
     },
-    JWT_ACCESS_SECRET,
+    JWT_ACCESS_SECRET,  
     { expiresIn: "1d" },
   );
 
@@ -91,6 +93,11 @@ export const loginUser = async (payload: LoginPayload) => {
   };
 };
 
+
+
+
+
+
 export const getUserProfile = async (userId: string) => {
   const user = await prisma.user.findUnique({
     where: { id: Number(userId) },
@@ -105,6 +112,8 @@ export const getUserProfile = async (userId: string) => {
   }
   return user;
 };
+
+
 
 export const updateUserProfile = async (
   userId: string,
