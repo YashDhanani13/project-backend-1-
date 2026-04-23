@@ -24,26 +24,37 @@ export const createEmployee = async (data: any) => {
     })
 }
 
-export const getEmployee = async (search?: string, organizationId?: number) => {
-    return await prisma.employee.findMany({
-        where: {
-            ...(organizationId ? { organizationId } : {}),
-            ...(search
-                ? {
-                      OR: [
-                          { name: { contains: search, mode: 'insensitive' } },
-                          { email: { contains: search, mode: 'insensitive' } },
-                          {
-                              phoneNumber: {
-                                  contains: search,
-                                  mode: 'insensitive',
-                              },
-                          },
-                      ],
-                  }
-                : {}),
-        },
-    })
+export const getEmployee = async (
+    search?: string,
+    field?: string,
+    value?: string,
+    organizationId?: number
+) => {
+    const where: any = {}
+
+    if (organizationId) where.organizationId = organizationId
+
+    // SCENARIO 1: Global Search (Look in everything)
+    if (search) {
+        where.OR = [
+            { name: { contains: search, mode: 'insensitive' } },
+            { email: { contains: search, mode: 'insensitive' } },
+            // { role: { contains: search, mode: 'insensitive' } },
+            { phoneNumber: { contains: search, mode: 'insensitive' } },
+            // { status: { contains: search, mode: 'insensitive' } },
+        ]
+    }
+
+    // SCENARIO 2: Specific Field Filter (e.g., search ONLY by Tag)
+    else if (field && value) {
+        if (field === 'tag') {
+            where.tag = { equals: value.toUpperCase() }
+        } else {
+            where[field] = { contains: value, mode: 'insensitive' }
+        }
+    }
+
+    return prisma.employee.findMany({ where })
 }
 
 export const updateEmployee = async (

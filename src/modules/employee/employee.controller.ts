@@ -30,48 +30,29 @@ export const createEmployee = async (req: Request, res: Response) => {
     }
 }
 
+
 export const getEmployee = async (req: Request, res: Response) => {
-    logger.info('Retrieving employees')
+    logger.info('Retrieving contacts')
     try {
         const userReq = req as any
-        const result = await employeeService.getEmployee(
-            undefined,
-            userReq.organizationId
-        )
-
-        res.status(200).json({
-            success: true,
-            message: 'Employees fetched successfully',
-            data: result,
-        })
-    } catch (error: any) {
-        logger.error(`Error retrieving employees: ${error.message}`)
-        res.status(500).json({
-            success: false,
-            message: error.message || 'Failed to get employees',
-        })
-    }
-}
-
-export const getSearch = async (req: Request, res: Response) => {
-    try {
-        const userReq = req as any
-        const { search } = req.query
+        const { search, field, value } = req.query
 
         const result = await employeeService.getEmployee(
             search as string,
+            field as string,
+            value as string,
             userReq.organizationId
         )
-
         res.status(200).json({
             success: true,
-            message: 'Search success',
+            message: 'Contacts retrieved successfully',
             data: result,
         })
     } catch (error: any) {
+        logger.error(`Error retrieving contacts: ${error.message}`)
         res.status(500).json({
             success: false,
-            message: error.message || 'Search not found',
+            message: error.message || 'Failed to get contacts',
         })
     }
 }

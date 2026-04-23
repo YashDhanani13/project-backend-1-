@@ -31,7 +31,7 @@ model User {
   contactsUpdated   Contact[]    @relation("ContactUpdatedBy")  contacts this user updated
   employeesCreated  Employee[]   @relation("EmployeeCreatedBy")  employees this user created
   employeesUpdated  Employee[]   @relation("EmployeeUpdatedBy")  employees this user updated
-}
+} 
 
 model Contact {
   

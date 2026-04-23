@@ -1,28 +1,29 @@
 import 'dotenv/config'
 import cookieParser from 'cookie-parser'
 import express, { Request, Response, NextFunction } from 'express'
-import cors from 'cors' // this only allow which you alllow with comunication for
-import helmet from 'helmet' // csp for  security for this
-import cron from 'node-cron' // automatic run the  messaage
+import cors from 'cors' 
+import helmet from 'helmet' 
+import cron from 'node-cron' 
 import prisma from './src/lib/prisma.js'
-import { router as authRouter } from './src/auth/auth.route.js' // auth file : [singup .  login]
-import contactsRouter from './src/modules/contacts/contacts.route.js' // contact route file
-import employeeRouter from './src/modules/employee/employee.route.js' // employe route file
+import { router as authRouter } from './src/auth/auth.route.js' 
+import contactsRouter from './src/modules/contacts/contacts.route.js' 
+import employeeRouter from './src/modules/employee/employee.route.js' 
 import { rateLimit } from 'express-rate-limit'
 
 const app = express()
+
 app.use(helmet()) // secure the malware image  , link , png, video   etc :
 
 app.use(
     cors({
         origin: process.env.FRONTEND_URL || 'http://localhost:5173',
-        credentials: true,
+        credentials: true,   // for cookie allow
     })
 )
 
-const limiter = rateLimit({
+const limiter = rateLimit({   //limit  set  for 1 user 200 request in 15 min
     windowMs: 15 * 60 * 1000,
-    max: 200,
+    max: 10,
     handler: (req, res) => {
         res.status(429).json({
             success: false,
@@ -43,7 +44,7 @@ app.use((req: Request, res: Response, next: NextFunction) => {
     res.on('finish', () => {
         console.log(
             `${req.method} ${req.originalUrl} - ${res.statusCode} - ${Date.now() - start}ms`
-        )
+        )   
     })
     next()
 })

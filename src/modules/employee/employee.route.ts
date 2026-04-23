@@ -4,7 +4,7 @@ import {
     getEmployee,
     updateEmployee,
     deleteEmployee,
-    getSearch,
+   
 } from './employee.controller.js'
 
 import { authMiddleware } from '../../auth/auth.middleware.js'
@@ -12,7 +12,7 @@ import { authMiddleware } from '../../auth/auth.middleware.js'
 const router = Router()
 router.use(authMiddleware)
 
-router.get('/search', getSearch)
+// router.get('/search', getEmployee)
 router.post('/', createEmployee)
 router.get('/', getEmployee)
 router.put('/:id', updateEmployee)
