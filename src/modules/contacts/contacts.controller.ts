@@ -57,11 +57,11 @@ export const getContacts = async (req: Request, res: Response) => {
 // contacts.controller.ts
 export const searchContacts = async (req: Request, res: Response) => {
   try {
-    const { search } = req.query  // ✅ get search
+    const { search } = req.query  
 
     const result = await ContactService.searchContacts(
       search as string,
-      req.organizationId!
+      req.organizationId
     )
 
     res.status(200).json({
@@ -79,8 +79,6 @@ export const searchContacts = async (req: Request, res: Response) => {
     }
   }
 }
-
-// ✅ no any!
 export const updateContact = async (req: Request, res: Response) => {
   logger.info('Updating contact')
   try {
@@ -88,14 +86,14 @@ export const updateContact = async (req: Request, res: Response) => {
 
     const body: UpdateContactData = {
       ...req.body,
-      updatedBy: req.userId,  // ✅ typed
-      age: req.body.age ? Number(req.body.age) : undefined,
+      updatedBy: req.userId,  
+          age: req.body.age ? Number(req.body.age) : undefined,
     }
 
     const result = await ContactService.updateContact(
       id,
-      req.organizationId!,  // ✅ typed
-      body
+      req.organizationId!,
+            body
     )
     res.status(200).json({
       success: true,
@@ -122,7 +120,7 @@ export const deleteContact = async (req: Request, res: Response) => {
       req.organizationId!  // ✅ typed
     )
     res.status(200).json({
-      success: true,
+      success: true,  
       message: 'Contact deleted successfully',
       data: result,
     })

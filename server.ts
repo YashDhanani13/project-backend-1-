@@ -23,7 +23,7 @@ app.use(
 
 const limiter = rateLimit({   //limit  set  for 1 user 200 request in 15 min
     windowMs: 15 * 60 * 1000,
-    max: 10,
+    max: 200,
     handler: (req, res) => {
         res.status(429).json({
             success: false,

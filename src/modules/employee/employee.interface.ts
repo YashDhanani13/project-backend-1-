@@ -14,7 +14,7 @@ export interface Employee {
   createdBy: number
   updatedBy?: number | null
   createdAt: Date
-  updatedAt: Date
+  updatedAt  : Date
 }
 
 // 2. For the UPDATE (PATCH) Request
@@ -33,4 +33,4 @@ export interface UpdateEmployeeData {
 
 // 3. The API Response
 // Usually the same as Employee, but sometimes you omit sensitive data
-export interface EmployeeResponse extends Employee {}
+export interface EmployeeResponse extends Employee {}z
