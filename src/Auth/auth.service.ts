@@ -27,7 +27,7 @@ export const signupUser = async (payload: SignupPayload) => {
     if (existingUser) throw new Error('Email already exists')
 
     //hash  before this are  create this password so create time this   are  hashh
-    const hashedPassword = await bcrypt.hash(payload.password, 10)
+    const hashedPassword = await bcrypt.hash(payload.password, 12)
 
     // create organization
     const organization = await prisma.organization.create({

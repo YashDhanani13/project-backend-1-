@@ -2,18 +2,18 @@ import { type Request, type Response } from 'express'
 import * as employeeService from './employee.service.js'
 import logger from '../../utils/logger.js'
 import { log } from 'console'
+import { Organization } from '@prisma/client'
+import { CreateEmployeeData, UpdateEmployeeData } from './employee.interface.js'
 
+import { fromJSONSchema } from 'zod'
 export const createEmployee = async (req: Request, res: Response) => {
     logger.info('Creating a new employee')
     try {
-        const userReq = req as any
-
-        const body = {
+        const body: CreateEmployeeData = {
             ...req.body,
-            organizationId: userReq.organizationId,
-            userID: userReq.userId, // Change
+            organizationId: req.organizationId,
+            createdBy: req.userId,
         }
-        console.log('Controller prepared body:', body)
 
         const result = await employeeService.createEmployee(body)
         res.status(201).json({
@@ -30,18 +30,17 @@ export const createEmployee = async (req: Request, res: Response) => {
     }
 }
 
-
 export const getEmployee = async (req: Request, res: Response) => {
     logger.info('Retrieving contacts')
     try {
-        const userReq = req as any
+        // const userReq = req as any
         const { search, field, value } = req.query
 
         const result = await employeeService.getEmployee(
             search as string,
             field as string,
             value as string,
-            userReq.organizationId
+            req.organizationId //
         )
         res.status(200).json({
             success: true,
@@ -60,18 +59,19 @@ export const getEmployee = async (req: Request, res: Response) => {
 export const updateEmployee = async (req: Request, res: Response) => {
     logger.info('Updating employee')
     try {
-        const userReq = req as any
-        const { id } = req.params
-        const body = {
+        const id = Number(req.params.id)
+
+        const body: UpdateEmployeeData = {
             ...req.body,
-            updatedBy: userReq.userId,
+            updatedBy: req.userId,
+            age: req.body.age ? Number(req.body.age) : undefined,
         }
+
         const result = await employeeService.updateEmployee(
-            Number(id),
-            userReq.organizationId,
+            id,
+            req.organizationId!,
             body
         )
-
         res.status(200).json({
             success: true,
             message: 'Employee updated successfully',
@@ -89,11 +89,12 @@ export const updateEmployee = async (req: Request, res: Response) => {
 export const deleteEmployee = async (req: Request, res: Response) => {
     logger.info('Deleting employee')
     try {
-        const userReq = req as any
-        const { id } = req.params
+        // const userReq = req as any
+        const id = Number(req.params.id)
+
         const result = await employeeService.deleteEmployee(
-            Number(id),
-            userReq.organizationId
+            id,
+            req.organizationId!
         )
         res.status(200).json({
             success: true,

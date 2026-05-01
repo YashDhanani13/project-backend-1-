@@ -9,8 +9,7 @@ export interface LoginPayload {
     email: string
     password: string
 }
-export  interface UpdateProfilePaylod{
-
-fullName:string 
-email :string 
+export interface UpdateProfilePaylod {
+    fullName: string
+    email: string
 }

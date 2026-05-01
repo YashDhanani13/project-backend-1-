@@ -127,3 +127,30 @@ To deploy:
 4. Deploy. (The `vercel.json` and `postinstall` script will handle the build and Prisma client generation automatically.)
 
 ---
+
+
+
+
+
+
+
+
+<!-- 
+- helmet 
+- eslint 
+- prittier 
+- huskey
+- nodemon 
+
+
+
+- cors 
+- cookie 
+- rate limiting are used here 
+- zod 
+- jwt 
+
+- bcrypt 
+- pino , pino pretty
+- cron job 
+- dotenv -->

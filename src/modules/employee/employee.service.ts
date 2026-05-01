@@ -43,10 +43,7 @@ export const getEmployee = async (
             { phoneNumber: { contains: search, mode: 'insensitive' } },
             // { status: { contains: search, mode: 'insensitive' } },
         ]
-    }
-
-    // SCENARIO 2: Specific Field Filter (e.g., search ONLY by Tag)
-    else if (field && value) {
+    } else if (field && value) {
         if (field === 'tag') {
             where.tag = { equals: value.toUpperCase() }
         } else {

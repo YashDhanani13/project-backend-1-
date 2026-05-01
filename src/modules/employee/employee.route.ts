@@ -4,7 +4,6 @@ import {
     getEmployee,
     updateEmployee,
     deleteEmployee,
-   
 } from './employee.controller.js'
 
 import { authMiddleware } from '../../auth/auth.middleware.js'

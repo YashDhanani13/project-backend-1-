@@ -1,7 +1,6 @@
 import { EmployeeRole, EmployeeStatus, Tag } from '@prisma/client'
 
-// 1. The Core Object (What comes out of the DB)
-export interface Employee {
+export interface CreateEmployeeData {
   id: number
   name: string
   email: string
@@ -27,10 +26,6 @@ export interface UpdateEmployeeData {
   age?: number | string
   phoneNumber?: string
   address?: string
-  tag?: Tag                // Ensure Tag is imported from @prisma/client
-  updatedBy: number | string // Mandatory: for audit logs
+  tag?: Tag   
+  updatedBy: number | string 
 }
-
-// 3. The API Response
-// Usually the same as Employee, but sometimes you omit sensitive data
-export interface EmployeeResponse extends Employee {}z
