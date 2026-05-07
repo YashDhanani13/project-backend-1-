@@ -1,11 +1,10 @@
 import { type Request, type Response } from 'express'
 import * as employeeService from './employee.service.js'
 import logger from '../../utils/logger.js'
-import { log } from 'console'
-import { Organization } from '@prisma/client'
 import { CreateEmployeeData, UpdateEmployeeData } from './employee.interface.js'
 
-import { fromJSONSchema } from 'zod'
+//create :-
+
 export const createEmployee = async (req: Request, res: Response) => {
     logger.info('Creating a new employee')
     try {
@@ -40,7 +39,7 @@ export const getEmployee = async (req: Request, res: Response) => {
             search as string,
             field as string,
             value as string,
-            req.organizationId //
+            req.organizationId
         )
         res.status(200).json({
             success: true,

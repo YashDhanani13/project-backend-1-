@@ -11,7 +11,8 @@ import { authMiddleware } from '../../auth/auth.middleware.js'
 const router = Router()
 router.use(authMiddleware)
 
-// router.get('/search', getEmployee)
+router.get('/search', getEmployee)
+
 router.post('/', createEmployee)
 router.get('/', getEmployee)
 router.put('/:id', updateEmployee)

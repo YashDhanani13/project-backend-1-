@@ -6,6 +6,7 @@ import {
     ContactResponse,
 } from './contacts.interface.js'
 
+//create
 export const createContact = async (
     data: CreateContactData
 ): Promise<ContactResponse> => {
@@ -63,25 +64,25 @@ export const getContacts = async (
     return prisma.contact.findMany({ where })
 }
 // contacts.service.ts
-export const searchContacts = async (
-    search: string,
-    organizationId: number
-) => {
-    const where: Prisma.ContactWhereInput = {
-        organizationId,
-    }
+// export const searchContacts = async (
+//     search: string,
+//     organizationId: number
+// ) => {
+//     const where: Prisma.ContactWhereInput = {
+//         organizationId,
+//     }
 
-    if (search) {
-        where.OR = [
-            { name: { contains: search, mode: 'insensitive' } },
-            { email: { contains: search, mode: 'insensitive' } },
-            { phoneNumber: { contains: search, mode: 'insensitive' } },
-            { address: { contains: search, mode: 'insensitive' } },
-        ]
-    }
+//     if (search) {
+//         where.OR = [
+//             { name: { contains: search, mode: 'insensitive' } },
+//             { email: { contains: search, mode: 'insensitive' } },
+//             { phoneNumber: { contains: search, mode: 'insensitive' } },
+//             { address: { contains: search, mode: 'insensitive' } },
+//         ]
+//     }
 
-    return prisma.contact.findMany({ where })
-}
+//     return prisma.contact.findMany({ where })
+// }
 
 export const updateContact = async (
     id: number,

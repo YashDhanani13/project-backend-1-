@@ -6,6 +6,7 @@ import { CreateContactData, UpdateContactData } from './contacts.interface.js'
 export const createContact = async (req: Request, res: Response) => {
     logger.info('Creating a new contact')
     try {
+        
         const body: CreateContactData = {
             ...req.body,
             organizationId: req.organizationId,

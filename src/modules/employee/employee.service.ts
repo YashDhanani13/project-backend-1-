@@ -1,13 +1,23 @@
 import prisma from '../../lib/prisma.js'
-import { EmployeeRole, EmployeeStatus } from '@prisma/client'
+import { EmployeeRole, EmployeeStatus, Prisma } from '@prisma/client'
 
-export const createEmployee = async (data: any) => {
+import {
+    CreateEmployeeData,
+    UpdateEmployeeData,
+    EmployeeResponse,
+} from './employee.interface.js'
+
+//create
+
+export const createEmployee = async (
+    data: CreateEmployeeData
+): Promise<CreateEmployeeData> => {
     const orgId = Number(data.organizationId)
-    const creatorId = Number(data.userID)
+    const creatorId = Number(data.createdBy)
 
     if (isNaN(orgId) || isNaN(creatorId)) {
         throw new Error(
-            `Missing or invalid IDs: organizationId=${data.organizationId}, userID=${data.userID}`
+            `Missing or invalid IDs: organizationId=${data.organizationId}, userID=${data.createdBy}`
         )
     }
 
@@ -30,7 +40,7 @@ export const getEmployee = async (
     value?: string,
     organizationId?: number
 ) => {
-    const where: any = {}
+    const where:  Prisma.EmployeeWhereInput = {}
 
     if (organizationId) where.organizationId = organizationId
 
@@ -39,25 +49,32 @@ export const getEmployee = async (
         where.OR = [
             { name: { contains: search, mode: 'insensitive' } },
             { email: { contains: search, mode: 'insensitive' } },
-            // { role: { contains: search, mode: 'insensitive' } },
-            { phoneNumber: { contains: search, mode: 'insensitive' } },
-            // { status: { contains: search, mode: 'insensitive' } },
+        //    { role: { contains: search, mode: "insensitive" } },
+      { phoneNumber: { contains: search, mode: "insensitive" } },
+    //   { status: { contains: search, mode: "insensitive" } },
         ]
-    } else if (field && value) {
-        if (field === 'tag') {
-            where.tag = { equals: value.toUpperCase() }
-        } else {
-            where[field] = { contains: value, mode: 'insensitive' }
-        }
+ } else if (field && value) {
+    // ✅ Check if field is EITHER "role" OR "status"
+    if (field === "role" || field === "status") {
+      ;(where as Record<string, unknown>)[field] = {
+        equals: value.toUpperCase(),
+      }
+    } else {
+      ;(where as Record<string, unknown>)[field] = {
+        contains: value,
+        mode: "insensitive",
+      }
     }
+  }
 
-    return prisma.employee.findMany({ where })
+  return prisma.employee.findMany({ where })
 }
+
 
 export const updateEmployee = async (
     id: number,
     organizationId: number,
-    data: any
+    data: UpdateEmployeeData
 ) => {
     const employee = await prisma.employee.findFirst({
         where: { id, organizationId },
@@ -72,7 +89,7 @@ export const updateEmployee = async (
             role: data.role,
             phoneNumber: data.phoneNumber,
             status: data.status,
-            updatedBy: data.updatedBy,
+            updatedBy: data.updatedBy ? Number(data.updatedBy) : undefined,
         },
     })
 }
