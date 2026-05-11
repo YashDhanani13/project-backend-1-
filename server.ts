@@ -1,16 +1,17 @@
 import 'dotenv/config'
 import cookieParser from 'cookie-parser'
 import express, { Request, Response, NextFunction } from 'express'
-import cors from 'cors'
 import helmet from 'helmet'
-import cron from 'node-cron'
+import cors from 'cors'
+
 import prisma from './src/lib/prisma.js'
 import { router as authRouter } from './src/auth/auth.route.js'
 import contactsRouter from './src/modules/contacts/contacts.route.js'
 import employeeRouter from './src/modules/employee/employee.route.js'
+import cron from 'node-cron'
 import { rateLimit } from 'express-rate-limit'
-
 const app = express()
+
 
 app.use(helmet()) // secure the malware image  , link , png, video   etc :
 
@@ -33,7 +34,6 @@ const limiter = rateLimit({
 })
 
 app.use(cookieParser()) //  this used to  store  refresh token for thsi used
-
 app.use(express.json()) // build in middleware
 app.use(express.urlencoded({ extended: false })) // build in middleware
 
@@ -50,14 +50,14 @@ app.use((req: Request, res: Response, next: NextFunction) => {
 })
 
 app.use(limiter)
-//  route call
+
+// here  routing caling  :  auth  , contact , employee
 
 app.use('/api/auth', authRouter)
 app.use('/api/contacts', contactsRouter)
 app.use('/api/employee', employeeRouter)
 
-//starting message :-
-
+//starting message :- [ connect   backne d work  now ]
 app.get('/', (_req: Request, res: Response) => {
     res.json({ message: 'Welcome to the API backend! 🚀', status: 'running' })
 })
@@ -71,14 +71,14 @@ app.get('/health', async (_req: Request, res: Response) => {
         res.status(500).json({ message: 'Database connection failed' })
     }
 })
-//  show the error
+//  show the error [error handle for    global  errorr  handler ]
 
 app.use((err: Error, _req: Request, res: Response, _next: NextFunction) => {
     console.error(`[Error] ${err.message}`)
     res.status(500).json({ message: err.message })
 })
 
-// ── Cron Jobs ───────────────
+// ── Cron Jobs ───────────────[ scheduling  task for this are  used this ]
 
 cron.schedule('*/10 * * * *', () => {
     console.log('Cron: running every 10 minutes')
