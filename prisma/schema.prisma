@@ -1,152 +1,152 @@
-generator client {
-  provider   = "prisma-client-js"
-  engineType = "binary"
-}
+  generator client {
+    provider   = "prisma-client-js"
+    engineType = "binary"
+  }
 
-datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
-}
+  datasource db {
+    provider = "postgresql"
+    url      = env("DATABASE_URL")
+  }
 
-// ✅ Fixed: Added @id (was completely missing)
-model Organization {
-  id               Int        @id @default(autoincrement())
-  organizationName String
-  createdAt        DateTime   @default(now())
-  updatedAt        DateTime   @updatedAt
+  // ✅ Fixed: Added @id (was completely missing)
+  model Organization {
+    id               Int        @id @default(autoincrement())
+    organizationName String
+    createdAt        DateTime   @default(now())
+    updatedAt        DateTime   @updatedAt
 
-  users      User[]
-  contacts   Contact[]
-  employees  Employee[]
-  userRooms  UserRoom[] // ✅ Added missing back-relation
-  rooms      Room[]     // ✅ Added missing back-relation
-}
+    users      User[]
+    contacts   Contact[]
+    employees  Employee[]
+    userRooms  UserRoom[] // ✅ Added missing back-relation
+    rooms      Room[]     // ✅ Added missing back-relation
+  }
 
-model User {
-  id             Int      @id @default(autoincrement())
-  fullName       String
-  email          String   @unique
-  password       String
-  organizationId Int
-  profileImage   String?
-  isDeleted      Boolean  @default(false)
-  createdAt      DateTime @default(now())
-  updatedAt      DateTime @updatedAt
+  model User {
+    id             Int      @id @default(autoincrement())
+    fullName       String
+    email          String   @unique
+    password       String
+    organizationId Int
+    profileImage   String?
+    isDeleted      Boolean  @default(false)
+    createdAt      DateTime @default(now())
+    updatedAt      DateTime @updatedAt
 
-  organization     Organization @relation(fields: [organizationId], references: [id])
+    organization     Organization @relation(fields: [organizationId], references: [id])
 
-  contactsCreated  Contact[]  @relation("ContactCreatedBy")
-  contactsUpdated  Contact[]  @relation("ContactUpdatedBy")
+    contactsCreated  Contact[]  @relation("ContactCreatedBy")
+    contactsUpdated  Contact[]  @relation("ContactUpdatedBy")
 
-  employeesCreated Employee[] @relation("EmployeeCreatedBy")
-  employeesUpdated Employee[] @relation("EmployeeUpdatedBy")
+    employeesCreated Employee[] @relation("EmployeeCreatedBy")
+    employeesUpdated Employee[] @relation("EmployeeUpdatedBy")
 
-  messages         Message[]  @relation("MessageSentBy")       // ✅ Added back-relation
-  messagesUpdated  Message[]  @relation("MessageUpdatedBy")     // ✅ Added back-relation
-  userRooms        UserRoom[] @relation("UserRoomMember")       // ✅ Added back-relation
-  userRoomsCreated UserRoom[] @relation("UserRoomCreatedBy")    // ✅ Added back-relation
-}
+    messages         Message[]  @relation("MessageSentBy")       // ✅ Added back-relation
+    messagesUpdated  Message[]  @relation("MessageUpdatedBy")     // ✅ Added back-relation
+    userRooms        UserRoom[] @relation("UserRoomMember")       // ✅ Added back-relation
+    userRoomsCreated UserRoom[] @relation("UserRoomCreatedBy")    // ✅ Added back-relation
+  }
 
-model Contact {
-  id             Int      @id @default(autoincrement())
-  name           String
-  email          String   @unique
-  age            Int?
-  phoneNumber    String?
-  address        String?
-  tag            Tag?
-  organizationId Int
-  createdBy      Int
-  updatedBy      Int?
-  createdAt      DateTime @default(now())
-  updatedAt      DateTime @updatedAt
+  model Contact {
+    id             Int      @id @default(autoincrement())
+    name           String
+    email          String   @unique
+    age            Int?
+    phoneNumber    String?
+    address        String?
+    tag            Tag?
+    organizationId Int
+    createdBy      Int
+    updatedBy      Int?
+    createdAt      DateTime @default(now())
+    updatedAt      DateTime @updatedAt
 
-  organization  Organization @relation(fields: [organizationId], references: [id])
-  createdByUser User         @relation("ContactCreatedBy", fields: [createdBy], references: [id])
-  updatedByUser User?        @relation("ContactUpdatedBy", fields: [updatedBy], references: [id])
-}
+    organization  Organization @relation(fields: [organizationId], references: [id])
+    createdByUser User         @relation("ContactCreatedBy", fields: [createdBy], references: [id])
+    updatedByUser User?        @relation("ContactUpdatedBy", fields: [updatedBy], references: [id])
+  }
 
-model Employee {
-  id             Int            @id @default(autoincrement())
-  name           String
-  email          String         @unique
-  role           EmployeeRole
-  phoneNumber    String
-  status         EmployeeStatus @default(ACTIVE)
-  organizationId Int
-  createdBy      Int
-  updatedBy      Int?
-  createdAt      DateTime       @default(now())
-  updatedAt      DateTime       @updatedAt
+  model Employee {
+    id             Int            @id @default(autoincrement())
+    name           String
+    email          String         @unique
+    role           EmployeeRole
+    phoneNumber    String
+    status         EmployeeStatus @default(ACTIVE)
+    organizationId Int
+    createdBy      Int
+    updatedBy      Int?
+    createdAt      DateTime       @default(now())
+    updatedAt      DateTime       @updatedAt
 
-  organization  Organization @relation(fields: [organizationId], references: [id])
-  createdByUser User         @relation("EmployeeCreatedBy", fields: [createdBy], references: [id])
-  updatedByUser User?        @relation("EmployeeUpdatedBy", fields: [updatedBy], references: [id])
-}
+    organization  Organization @relation(fields: [organizationId], references: [id])
+    createdByUser User         @relation("EmployeeCreatedBy", fields: [createdBy], references: [id])
+    updatedByUser User?        @relation("EmployeeUpdatedBy", fields: [updatedBy], references: [id])
+  }
 
-model Message {
-  id        Int       @id @default(autoincrement())
-  text      String
-  roomId    Int       // ✅ Added: message must belong to a room
-  senderId  Int       // ✅ Renamed: userId → senderId (clearer), removed redundant createdBy
-  isDeleted Boolean   @default(false)
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
-  updatedBy Int?
-  deletedAt DateTime?
-  deletedBy Int?
+  model Message {
+    id        Int       @id @default(autoincrement())
+    text      String
+    roomId    Int       // ✅ Added: message must belong to a room
+    senderId  Int       // ✅ Renamed: userId → senderId (clearer), removed redundant createdBy
+    isDeleted Boolean   @default(false)
+    createdAt DateTime  @default(now())
+    updatedAt DateTime  @updatedAt
+    updatedBy Int?
+    deletedAt DateTime?
+    deletedBy Int?
 
-  room          Room  @relation(fields: [roomId], references: [id])  // ✅ Added
-  sender        User  @relation("MessageSentBy", fields: [senderId], references: [id])
-  updatedByUser User? @relation("MessageUpdatedBy", fields: [updatedBy], references: [id])
-}
+    room          Room  @relation(fields: [roomId], references: [id])  // ✅ Added
+    sender        User  @relation("MessageSentBy", fields: [senderId], references: [id])
+    updatedByUser User? @relation("MessageUpdatedBy", fields: [updatedBy], references: [id])
+  }
 
-model UserRoom {
-  id             Int      @id @default(autoincrement())
-  userId         Int
-  organizationId Int
-  roomId         Int
-  createdAt      DateTime @default(now())
-  createdBy      Int
-  updatedAt      DateTime @updatedAt
-  updatedBy      Int?
+  model UserRoom {
+    id             Int      @id @default(autoincrement())
+    userId         Int
+    organizationId Int
+    roomId         Int
+    createdAt      DateTime @default(now())
+    createdBy      Int
+    updatedAt      DateTime @updatedAt
+    updatedBy      Int?
 
-  user         User         @relation("UserRoomMember", fields: [userId], references: [id])
-  organization Organization @relation(fields: [organizationId], references: [id])
-  room         Room         @relation(fields: [roomId], references: [id])
-  createdByUser User        @relation("UserRoomCreatedBy", fields: [createdBy], references: [id]) // ✅ Added
+    user         User         @relation("UserRoomMember", fields: [userId], references: [id])
+    organization Organization @relation(fields: [organizationId], references: [id])
+    room         Room         @relation(fields: [roomId], references: [id])
+    createdByUser User        @relation("UserRoomCreatedBy", fields: [createdBy], references: [id]) // ✅ Added
 
-  @@unique([userId, roomId])
-}
+    @@unique([userId, roomId])
+  }
 
-model Room {
-  id                 Int       @id @default(autoincrement())
-  organizationId     Int
-  lastMessageAt      DateTime?
-  isDeleted          Boolean   @default(false)
-  createdAt          DateTime  @default(now())
-  createdBy          Int       // ✅ Added missing field
-  updatedAt          DateTime  @updatedAt
-  updatedBy          Int?
-  unreadMessageCount Int       @default(0)
+  model Room {
+    id                 Int       @id @default(autoincrement())
+    organizationId     Int
+    lastMessageAt      DateTime?
+    isDeleted          Boolean   @default(false)
+    createdAt          DateTime  @default(now())
+    createdBy          Int       // ✅ Added missing field
+    updatedAt          DateTime  @updatedAt
+    updatedBy          Int?
+    unreadMessageCount Int       @default(0)
 
-  organization Organization @relation(fields: [organizationId], references: [id])
-  userRooms    UserRoom[]
-  messages     Message[]
-}
+    organization Organization @relation(fields: [organizationId], references: [id])
+    userRooms    UserRoom[]
+    messages     Message[]
+  }
 
-enum Tag {
-  VIP
-  VVIP
-  REGULAR
-}
+  enum Tag {
+    VIP
+    VVIP
+    REGULAR
+  }
 
-enum EmployeeRole {
-  ADMIN
-  EMPLOYEE
-}
+  enum EmployeeRole {
+    ADMIN
+    EMPLOYEE
+  }
 
-enum EmployeeStatus {
-  ACTIVE
-  INACTIVE // ✅ Fixed: removed stray "b"
-}
+  enum EmployeeStatus {
+    ACTIVE
+    INACTIVE // ✅ Fixed: removed stray "b"
+  }
