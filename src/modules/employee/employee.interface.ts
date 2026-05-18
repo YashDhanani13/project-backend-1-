@@ -6,9 +6,8 @@ export interface CreateEmployeeData {
     role: EmployeeRole
     phoneNumber: string
     status: EmployeeStatus
-     organizationId: number | string
+    organizationId: number | string
     createdBy: number | string
-  
 }
 
 export interface UpdateEmployeeData {

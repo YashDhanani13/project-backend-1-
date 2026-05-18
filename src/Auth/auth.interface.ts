@@ -12,4 +12,6 @@ export interface LoginPayload {
 export interface UpdateProfilePaylod {
     fullName: string
     email: string
+    profileImage :string
 }
+    

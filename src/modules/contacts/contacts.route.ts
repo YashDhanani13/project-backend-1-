@@ -16,6 +16,7 @@ router.get('/search', getContacts)
 
 router.post('/', createContact)
 router.get('/', getContacts)
+// router.get('/:id', getContactById) 
 router.put('/:id', updateContact)
 router.delete('/:id', deleteContact)
 

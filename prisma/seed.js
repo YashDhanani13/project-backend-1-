@@ -46,7 +46,7 @@ async function main() {
     { name: "yashvi", email: "yashvi_99@gmail.com", password: "yashvi@123", age: 21, phoneNumber: 8866554433, address: "piplod lake garden surat" },
     { name: "karan", email: "karan.dev@gmail.com", password: "karan@123", age: 35, phoneNumber: 7755443322, address: "iskcon mandir road ahmedabad" },
     { name: "manav", email: "manav_p@gmail.com", password: "manav@123", age: 40, phoneNumber: 9900112233, address: "race course rajkot" },
-    { name: "sneha", email: "sneha_shah@gmail.com", password: "sneha@123", age: 24, phoneNumber: 9122334455, address: "m.g. road vadodara" },
+    { name: "sneha", email: "sneha_shah@gmail.com", password: "sneh@123", age: 24, phoneNumber: 9122334455, address: "m.g. road vadodara" },
     { name: "vivek", email: "vivek.surat@gmail.com", password: "vivek@123", age: 27, phoneNumber: 9555667788, address: "yogichowk varacha surat" },
 
     // ... add others here

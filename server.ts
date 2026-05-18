@@ -1,44 +1,55 @@
 import 'dotenv/config'
 import cookieParser from 'cookie-parser'
-import express, { Request, Response, NextFunction } from 'express'
 import helmet from 'helmet'
 import cors from 'cors'
+import express, { Request, Response, NextFunction } from 'express'
+import { createServer } from 'http'
+import { Server } from 'socket.io'
+import cron from 'node-cron'
+import { rateLimit } from 'express-rate-limit'
 
 import prisma from './src/lib/prisma.js'
 import { router as authRouter } from './src/auth/auth.route.js'
 import contactsRouter from './src/modules/contacts/contacts.route.js'
 import employeeRouter from './src/modules/employee/employee.route.js'
-import cron from 'node-cron'
-import { rateLimit } from 'express-rate-limit'
+import messageRouter from './src/socket/message.route.js'
+import { initializeSockets } from './src/socket/sockets.js'
+
+import conversationRouter from './src/socket/conversation.route.js'
+ // add this line
 const app = express()
+const httpServer = createServer(app)
 
-
-app.use(helmet()) // secure the malware image  , link , png, video   etc :
+// ── Security Middleware ──────────────────────────────────────────────────────
+app.use(helmet())
 
 app.use(
     cors({
         origin: process.env.FRONTEND_URL || 'http://localhost:5173',
-        credentials: true, // for cookie allow
+        credentials: true,
     })
 )
 
+// ── Rate Limiter (before body parsing to reject early) ───────────────────────
 const limiter = rateLimit({
     windowMs: 15 * 60 * 1000, // 15 minutes
-    max: 150,
-    handler: (req, res) => {
+    max: 300,
+    handler: (_req, res) => {
         res.status(429).json({
             success: false,
-            message: 'Too many requests , try againn  later.',
+            message: 'Too many requests, try again later.',
         })
     },
 })
 
-app.use(cookieParser()) //  this used to  store  refresh token for thsi used
-app.use(express.json()) // build in middleware
-app.use(express.urlencoded({ extended: false })) // build in middleware
+app.use(limiter)
 
-//which request call this throguh show in terminal
+// ── Body Parsing ─────────────────────────────────────────────────────────────
+app.use(cookieParser())
+app.use(express.json())
+app.use(express.urlencoded({ extended: false }))
 
+// ── Request Logger ───────────────────────────────────────────────────────────
 app.use((req: Request, res: Response, next: NextFunction) => {
     const start = Date.now()
     res.on('finish', () => {
@@ -49,20 +60,30 @@ app.use((req: Request, res: Response, next: NextFunction) => {
     next()
 })
 
-app.use(limiter)
+// ── Socket.IO ────────────────────────────────────────────────────────────────
+const io = new Server(httpServer, {
+    cors: {
+        origin: process.env.FRONTEND_URL || 'http://localhost:5173',
+        credentials: true,
+    },
+})
 
-// here  routing caling  :  auth  , contact , employee
+initializeSockets(io)
 
+// ── Routes ───────────────────────────────────────────────────────────────────
 app.use('/api/auth', authRouter)
 app.use('/api/contacts', contactsRouter)
 app.use('/api/employee', employeeRouter)
+app.use('/api/messages', messageRouter)
+app.use('/api/conversations', conversationRouter) 
 
-//starting message :- [ connect   backne d work  now ]
+
+
+
 app.get('/', (_req: Request, res: Response) => {
     res.json({ message: 'Welcome to the API backend! 🚀', status: 'running' })
 })
 
-// this checkk the  database health check
 app.get('/health', async (_req: Request, res: Response) => {
     try {
         await prisma.$queryRaw`SELECT 1`
@@ -71,20 +92,19 @@ app.get('/health', async (_req: Request, res: Response) => {
         res.status(500).json({ message: 'Database connection failed' })
     }
 })
-//  show the error [error handle for    global  errorr  handler ]
 
+// ── Global Error Handler ─────────────────────────────────────────────────────
 app.use((err: Error, _req: Request, res: Response, _next: NextFunction) => {
     console.error(`[Error] ${err.message}`)
     res.status(500).json({ message: err.message })
 })
 
-// ── Cron Jobs ───────────────[ scheduling  task for this are  used this ]
-
+// ── Cron Jobs ────────────────────────────────────────────────────────────────
 cron.schedule('*/10 * * * *', () => {
     console.log('Cron: running every 10 minutes')
 })
 
-// // ── Process Crash Handlers ────────────────
+// ── Process Crash Handlers ───────────────────────────────────────────────────
 process.on('unhandledRejection', (err) => {
     console.error('❌ Unhandled Rejection:', err)
     process.exit(1)
@@ -95,17 +115,15 @@ process.on('uncaughtException', (err) => {
     process.exit(1)
 })
 
-// ── Start Server
-
+// ── Start Server ─────────────────────────────────────────────────────────────
 const PORT = process.env.PORT || 3000
 
 const start = async () => {
     try {
         await prisma.$connect()
-        console.log(' Database connected')
+        console.log('✅ Database connected')
 
-        //port
-        app.listen(PORT, () => {
+        httpServer.listen(PORT, () => {
             console.log(`🚀 Server running on port ${PORT}`)
         })
     } catch (error) {
