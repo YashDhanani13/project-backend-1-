@@ -128,8 +128,8 @@ model UserRoom {
 model Room {
   id             Int       @id @default(autoincrement())
   organizationId Int
-  name           String?   // ✅ Added — null for DMs, set for group chats
-  type           RoomType  @default(DIRECT)  // ✅ Added — DM vs Group
+  name           String?   
+  type           RoomType  @default(DIRECT) 
   lastMessageAt  DateTime?
   isDeleted      Boolean   @default(false)
   createdAt      DateTime  @default(now())

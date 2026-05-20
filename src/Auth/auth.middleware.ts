@@ -7,6 +7,10 @@ export const authMiddleware = async (
     res: Response,
     next: NextFunction
 ) => {
+
+
+
+    
     try {
         const token = req.headers.authorization?.split(' ')[1]
 

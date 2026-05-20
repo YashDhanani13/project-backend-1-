@@ -5,17 +5,14 @@ const router = Router()
 router.get('/:roomId', async (req: Request, res: Response) => {
     try {
         const { roomId } = req.params
-
         const messages = await prisma.message.findMany({
             where: {
                 roomId: Number(roomId),
             },
-
             orderBy: {
                 createdAt: 'asc',
             },
         })
-
         res.json({
             success: true,
             data: messages,

@@ -4,10 +4,10 @@ import { messageSocket } from './message.socket.js'
 import { roomSocket } from './room.socket.js'
 
 export const initializeSockets = (io: Server) => {
-    // ── Auth Middleware ── attaches userId to every socket ───────────────────
+ 
     io.use((socket, next) => {  
         try {
-            // Support token from auth header or cookie
+            
             const token =
                 socket.handshake.auth?.token ||
                 socket.handshake.headers?.authorization?.split(' ')[1]
@@ -33,6 +33,11 @@ export const initializeSockets = (io: Server) => {
             next(new Error('Unauthorized: Invalid token'))
         }
     })
+
+
+
+// main connection this  : - 
+
 
     io.on('connection', (socket) => {
         console.log(` User connected: ${socket.data.userId} [${socket.id}]`)

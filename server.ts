@@ -14,11 +14,17 @@ import contactsRouter from './src/modules/contacts/contacts.route.js'
 import employeeRouter from './src/modules/employee/employee.route.js'
 import messageRouter from './src/socket/message.route.js'
 import { initializeSockets } from './src/socket/sockets.js'
+// import multer from 'multer' 
 
 import conversationRouter from './src/socket/conversation.route.js'
+// import { destination } from 'pino'
  // add this line
 const app = express()
 const httpServer = createServer(app)
+// const  avatarStorage =  multer.diskStorage ({
+
+    // destination
+// })/
 
 // ── Security Middleware ──────────────────────────────────────────────────────
 app.use(helmet())
