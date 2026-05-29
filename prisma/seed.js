@@ -57,6 +57,7 @@ async function main() {
       where: { email: contact.email },
       update: {},
       create: contact,
+      // password: hashedPassword
     });
   }
   console.log("Contacts Seeded ");

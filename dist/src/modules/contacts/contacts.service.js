@@ -86,8 +86,7 @@ export const deleteContact = async (id, organizationId) => {
     const contact = await prisma.contact.findFirst({
         where: { id, organizationId },
     });
-    if (!contact)
-        throw new Error('Contact not found or access denied');
+    // if (!contact) throw new Error('Contact not found or access denied')
     return prisma.contact.delete({
         where: { id },
     });

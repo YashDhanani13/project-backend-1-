@@ -12,9 +12,9 @@ import { router as authRouter } from './src/auth/auth.route.js';
 import contactsRouter from './src/modules/contacts/contacts.route.js';
 import employeeRouter from './src/modules/employee/employee.route.js';
 import messageRouter from './src/socket/message.route.js';
-import { initializeSockets } from './src/socket/sockets.js';
+import { authSockets } from './src/socket/sockets.js';
 import conversationRouter from './src/socket/conversation.route.js';
-// add this line
+// import { destination } from 'pino'
 const app = express();
 const httpServer = createServer(app);
 // ── Security Middleware ──────────────────────────────────────────────────────
@@ -23,6 +23,7 @@ app.use(cors({
     origin: process.env.FRONTEND_URL || 'http://localhost:5173',
     credentials: true,
 }));
+// app.use(cors());
 // ── Rate Limiter (before body parsing to reject early) ───────────────────────
 const limiter = rateLimit({
     windowMs: 15 * 60 * 1000, // 15 minutes
@@ -54,13 +55,14 @@ const io = new Server(httpServer, {
         credentials: true,
     },
 });
-initializeSockets(io);
+authSockets(io);
 // ── Routes ───────────────────────────────────────────────────────────────────
 app.use('/api/auth', authRouter);
 app.use('/api/contacts', contactsRouter);
 app.use('/api/employee', employeeRouter);
 app.use('/api/messages', messageRouter);
 app.use('/api/conversations', conversationRouter);
+// app.use('api/messages' ,messageRouter )
 app.get('/', (_req, res) => {
     res.json({ message: 'Welcome to the API backend! 🚀', status: 'running' });
 });
@@ -84,11 +86,11 @@ cron.schedule('*/10 * * * *', () => {
 });
 // ── Process Crash Handlers ───────────────────────────────────────────────────
 process.on('unhandledRejection', (err) => {
-    console.error('❌ Unhandled Rejection:', err);
+    console.error(' Unhandled Rejection:', err);
     process.exit(1);
 });
 process.on('uncaughtException', (err) => {
-    console.error('❌ Uncaught Exception:', err);
+    console.error('Uncaught Exception:', err);
     process.exit(1);
 });
 // ── Start Server ─────────────────────────────────────────────────────────────
@@ -96,7 +98,7 @@ const PORT = process.env.PORT || 3000;
 const start = async () => {
     try {
         await prisma.$connect();
-        console.log('✅ Database connected');
+        console.log(' Database connected');
         httpServer.listen(PORT, () => {
             console.log(`🚀 Server running on port ${PORT}`);
         });

@@ -13,18 +13,16 @@ import { router as authRouter } from './src/auth/auth.route.js'
 import contactsRouter from './src/modules/contacts/contacts.route.js'
 import employeeRouter from './src/modules/employee/employee.route.js'
 import messageRouter from './src/socket/message.route.js'
-import { initializeSockets } from './src/socket/sockets.js'
-// import multer from 'multer' 
-
+import { authSockets } from './src/socket/sockets.js'
 import conversationRouter from './src/socket/conversation.route.js'
 // import { destination } from 'pino'
- // add this line
+
+
+
+
 const app = express()
 const httpServer = createServer(app)
-// const  avatarStorage =  multer.diskStorage ({
 
-    // destination
-// })/
 
 // ── Security Middleware ──────────────────────────────────────────────────────
 app.use(helmet())
@@ -35,6 +33,8 @@ app.use(
         credentials: true,
     })
 )
+// app.use(cors());
+
 
 // ── Rate Limiter (before body parsing to reject early) ───────────────────────
 const limiter = rateLimit({
@@ -74,7 +74,7 @@ const io = new Server(httpServer, {
     },
 })
 
-initializeSockets(io)
+authSockets(io)
 
 // ── Routes ───────────────────────────────────────────────────────────────────
 app.use('/api/auth', authRouter)
@@ -82,6 +82,7 @@ app.use('/api/contacts', contactsRouter)
 app.use('/api/employee', employeeRouter)
 app.use('/api/messages', messageRouter)
 app.use('/api/conversations', conversationRouter) 
+// app.use('api/messages' ,messageRouter )
 
 
 
@@ -112,12 +113,12 @@ cron.schedule('*/10 * * * *', () => {
 
 // ── Process Crash Handlers ───────────────────────────────────────────────────
 process.on('unhandledRejection', (err) => {
-    console.error('❌ Unhandled Rejection:', err)
+    console.error(' Unhandled Rejection:', err)
     process.exit(1)
 })
 
 process.on('uncaughtException', (err) => {
-    console.error('❌ Uncaught Exception:', err)
+    console.error('Uncaught Exception:', err)
     process.exit(1)
 })
 
@@ -127,7 +128,7 @@ const PORT = process.env.PORT || 3000
 const start = async () => {
     try {
         await prisma.$connect()
-        console.log('✅ Database connected')
+        console.log(' Database connected')
 
         httpServer.listen(PORT, () => {
             console.log(`🚀 Server running on port ${PORT}`)

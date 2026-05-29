@@ -1,47 +1,47 @@
 import prisma from '../lib/prisma.js';
-//recevive
-export const messageSocket = (io, socket) => {
+import { updateConversationLastMessage } from './conversation.route.js';
+export const messageSocket = (_io, socket) => {
     socket.on('send_message', async ({ roomId, text }) => {
         try {
-            if (!socket.data.userId) {
-                socket.emit('error', { message: 'Unauthorized user' });
+            const parsedRoomId = Number(roomId);
+            const messageText = String(text || '').trim();
+            const userId = Number(socket.data.userId);
+            if (!parsedRoomId || Number.isNaN(parsedRoomId) || !messageText) {
+                socket.emit('message_error', {
+                    message: 'Valid roomId and text are required',
+                });
+                return;
+            }
+            const member = await prisma.userRoom.findUnique({
+                where: {
+                    userId_roomId: {
+                        userId,
+                        roomId: parsedRoomId,
+                    },
+                },
+            });
+            if (!member) {
+                socket.emit('message_error', {
+                    message: 'You are not a member of this room',
+                });
                 return;
             }
             const message = await prisma.message.create({
                 data: {
-                    text,
-                    roomId: Number(roomId),
-                    senderId: socket.data.userId,
+                    text: messageText,
+                    roomId: parsedRoomId,
+                    senderId: userId,
                 },
             });
-            io.to(String(roomId)).emit('receive_message', message);
+            await updateConversationLastMessage(parsedRoomId, messageText);
+            socket.to(String(parsedRoomId)).emit('receive_message', message);
+            socket.emit('receive_message', message);
         }
         catch (error) {
-            console.error('DATABASE ERROR:', error);
-            socket.emit('error', { message: 'Failed to send message' });
-        }
-    });
-    socket.on('delete_message', async ({ messageId, roomId }) => {
-        try {
-            if (!socket.data.userId) {
-                socket.emit('error', { message: 'Unauthorized user' });
-                return;
-            }
-            await prisma.message.update({
-                where: {
-                    id: messageId,
-                    senderId: socket.data.userId,
-                },
-                data: { isDeleted: true },
+            console.error('SEND MESSAGE ERROR:', error);
+            socket.emit('message_error', {
+                message: 'Failed to send message',
             });
-            io.to(String(roomId)).emit('message_deleted', { messageId });
         }
-        catch (error) {
-            console.error('DELETE ERROR:', error);
-            socket.emit('error', { message: 'Failed to delete message' });
-        }
-    });
-    socket.on('disconnect', () => {
-        console.log('User disconnected');
     });
 };

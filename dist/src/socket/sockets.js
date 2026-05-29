@@ -1,11 +1,9 @@
 import jwt from 'jsonwebtoken';
 import { messageSocket } from './message.socket.js';
 import { roomSocket } from './room.socket.js';
-export const initializeSockets = (io) => {
-    // ── Auth Middleware ── attaches userId to every socket ───────────────────
+export const authSockets = (io) => {
     io.use((socket, next) => {
         try {
-            // Support token from auth header or cookie
             const token = socket.handshake.auth?.token ||
                 socket.handshake.headers?.authorization?.split(' ')[1];
             if (!token) {
@@ -23,12 +21,13 @@ export const initializeSockets = (io) => {
             next(new Error('Unauthorized: Invalid token'));
         }
     });
-    io.on('connection', (socket) => {
-        console.log(`✅ User connected: ${socket.data.userId} [${socket.id}]`);
+    //  main connection of  socket
+    io.on('connection', async (socket) => {
+        console.log(`User connected: ${socket.data.userId} [${socket.id}]`);
         roomSocket(io, socket);
         messageSocket(io, socket);
         socket.on('disconnect', () => {
-            console.log(`❌ User disconnected: ${socket.data.userId} [${socket.id}]`);
+            console.log(`User disconnected: ${socket.data.userId} [${socket.id}]`);
         });
     });
 };

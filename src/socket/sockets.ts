@@ -3,11 +3,9 @@ import jwt from 'jsonwebtoken'
 import { messageSocket } from './message.socket.js'
 import { roomSocket } from './room.socket.js'
 
-export const initializeSockets = (io: Server) => {
- 
-    io.use((socket, next) => {  
+export const authSockets = (io: Server) => {
+    io.use((socket, next) => {
         try {
-            
             const token =
                 socket.handshake.auth?.token ||
                 socket.handshake.headers?.authorization?.split(' ')[1]
@@ -34,20 +32,16 @@ export const initializeSockets = (io: Server) => {
         }
     })
 
-
-
-// main connection this  : - 
-
-
-    io.on('connection', (socket) => {
-        console.log(` User connected: ${socket.data.userId} [${socket.id}]`)
+    //  main connection of  socket
+    io.on('connection', async (socket) => {
+        console.log(`User connected: ${socket.data.userId} [${socket.id}]`)
 
         roomSocket(io, socket)
         messageSocket(io, socket)
 
         socket.on('disconnect', () => {
             console.log(
-                ` User disconnected: ${socket.data.userId} [${socket.id}]`
+                `User disconnected: ${socket.data.userId} [${socket.id}]`
             )
         })
     })

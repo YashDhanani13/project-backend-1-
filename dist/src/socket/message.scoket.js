@@ -7,7 +7,7 @@ export const messageSocket = (io, socket) => {
         try {
             console.log('ROOM ID:', roomId);
             console.log('TEXT:', text);
-            // ✅ Save to DB
+            // ✅ Save to Db
             const message = await prisma.message.create({
                 data: {
                     text,

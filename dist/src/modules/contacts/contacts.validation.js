@@ -16,5 +16,5 @@ export const createSchema = z.object({
     }),
     tag: z.enum(['VIP', 'VVIP', 'regular']),
     phoneNumber: z.string().min(10).max(11),
-    address: z.string().min(1),
+    address: z.string().min(1)
 });

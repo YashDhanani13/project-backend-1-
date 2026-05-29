@@ -3,12 +3,11 @@ import prisma from '../lib/prisma.js'
 import { authMiddleware } from '../auth/auth.middleware.js'
 
 const router = Router()
-
-// create a conversation  :-----------------------------------------------------------------
 router.post('/', authMiddleware, async (req: Request, res: Response) => {
     try {
         const organizationId = req.organizationId!
         const userId = req.userId!
+
         const { contactId } = req.body
 
         if (!contactId) {
@@ -19,7 +18,10 @@ router.post('/', authMiddleware, async (req: Request, res: Response) => {
         }
 
         const contact = await prisma.contact.findFirst({
-            where: { id: contactId, organizationId },
+            where: {
+                id: Number(contactId),
+                organizationId,
+            },
         })
 
         if (!contact) {
@@ -29,98 +31,88 @@ router.post('/', authMiddleware, async (req: Request, res: Response) => {
             })
         }
 
-        // Exiting   conversoin   ------------------------------------------------------------------------------
-        const existingConversation = await prisma.conversation.findFirst({
-            where: { organizationId, contactId },
+        console.log('CONTACT:', contact)
+
+        const otherUserId = contact.userId
+
+        if (!otherUserId) {
+            return res.status(400).json({
+                success: false,
+                message: 'Contact is not linked to a user',
+            })
+        }
+
+        const canonicalKey = [userId, otherUserId]
+            .sort((a, b) => a - b)
+            .join('-')
+
+        let room = await prisma.room.findUnique({
+            where: { canonicalKey },
+        })
+
+        if (!room) {
+            try {
+                room = await prisma.room.create({
+                    data: {
+                        name: 'Private Chat',
+                        type: 'DIRECT',
+                        canonicalKey,
+                        organizationId,
+                        createdBy: userId,
+                    },
+                })
+            } catch (error: any) {
+                if (error.code === 'P2002') {
+                    room = await prisma.room.findUnique({
+                        where: {
+                            canonicalKey,
+                        },
+                    })
+                } else {
+                    throw error
+                }
+            }
+        }
+
+        let conversation = await prisma.conversation.findFirst({
+            where: {
+                roomId: room!.id,
+            },
             include: {
-                contact: {
-                    select: {
-                        id: true,
-                        name: true,
-                        email: true,
-                        phoneNumber: true,
-                        tag: true,
-                    },
-                },
-                room: {
-                    select: {
-                        id: true,
-                        name: true,
-                        type: true,
-                        isDeleted: true,
-                    },
-                },
+                contact: true,
+                room: true,
             },
         })
 
-        if (existingConversation) {
-            return res.json({ success: true, data: existingConversation })
-        }
-
-        // ✅ Create room + conversation in transaction
-        const result = await prisma.$transaction(async (tx) => {
-            // ✅ Create room
-            const room = await tx.room.create({
-                data: {
-                    name: 'Private Chat',
-                    type: 'DIRECT',
-                    organization: { connect: { id: organizationId } },
-                    createdByUser: { connect: { id: userId } },
-                    // ✅ Add user to room
-                    userRooms: {
-                        create: {
-                            userId,
-                            organizationId,
-                            createdBy: userId,
-                        },
-                    },
-                },
-            })
-
-            // Create conversation
-            const conversation = await tx.conversation.create({
+        if (!conversation) {
+            conversation = await prisma.conversation.create({
                 data: {
                     organizationId,
-                    contactId,
-                    roomId: room.id,
+                    contactId: Number(contactId),
+                    roomId: room!.id,
                     lastMessage: '',
                     createdBy: userId,
                 },
                 include: {
-                    contact: {
-                        select: {
-                            id: true,
-                            name: true,
-                            email: true,
-                            phoneNumber: true,
-                            tag: true,
-                        },
-                    },
-                    room: {
-                        select: {
-                            id: true,
-                            name: true,
-                            type: true,
-                            isDeleted: true,
-                        },
-                    },
+                    contact: true,
+                    room: true,
                 },
             })
+        }
 
-            return conversation
+        return res.json({
+            success: true,
+            data: conversation,
         })
-
-        res.status(201).json({ success: true, data: result })
     } catch (error: any) {
-        console.error('CREATE CONVERSATION ERROR:', error.message)
-        res.status(500).json({
+        console.error('CREATE CONVERSATION ERROR:', error)
+
+        return res.status(500).json({
             success: false,
             message: error.message,
         })
     }
-})
-
-//  get conversationn last  conversauitn this   
+}) //  get conversationn last  conversauitn this
 router.get('/', authMiddleware, async (req: Request, res: Response) => {
     try {
         const organizationId = req.organizationId!
@@ -149,7 +141,7 @@ router.get('/', authMiddleware, async (req: Request, res: Response) => {
             orderBy: { lastMessageAt: 'desc' },
         })
 
-        // ✅ filter deleted rooms
+        // filter deleted rooms
         const active = conversations.filter((c) => !c.room?.isDeleted)
 
         res.json({ success: true, data: active })
